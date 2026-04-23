@@ -4,7 +4,7 @@ using System.Text;
 
 namespace coursework.Core
 {
-    internal interface ICalculatable
+    public interface ICalculatable
     {
         double CalculateKPI(); 
         string GetKPIDescription();
