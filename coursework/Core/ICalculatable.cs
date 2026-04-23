@@ -6,5 +6,7 @@ namespace coursework.Core
 {
     internal interface ICalculatable
     {
+        double CalculateKPI(); 
+        string GetKPIDescription();
     }
 }
