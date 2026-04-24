@@ -4,7 +4,7 @@ using System.Text;
 
 namespace coursework.Models
 {
-    internal class FoodZone
+    public class FoodZone
     {
     }
 }
