@@ -4,7 +4,7 @@ using System.Text;
 
 namespace coursework.Models
 {
-    internal class ChillZone
+    public class ChillZone
     {
     }
 }
