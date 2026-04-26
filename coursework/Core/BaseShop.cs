@@ -56,5 +56,52 @@ namespace coursework.Core
             TotalCustomersServed = 0;
             TotalWaitTimeMinutes = 0;
         }
+        public virtual void JoinQueue()
+        {
+            CashierQueue++;
+        }
+        public virtual void ProcessCashier(decimal orderTotal, decimal consumableCost)
+        {
+            if (CashierQueue > 0)
+            {
+                CashierQueue--; 
+                Revenue += orderTotal;
+                TotalConsumablesCost += consumableCost; 
+                KitchenQueue++;
+            }
+        }
+        public virtual void ProcessKitchen(double actualWaitTimeMinutes)
+        {
+            if (KitchenQueue > 0)
+            {
+                KitchenQueue--; 
+                TotalCustomersServed++; 
+                TotalWaitTimeMinutes += actualWaitTimeMinutes; 
+            }
+        }
+        public override double CalculateKPI()
+        {
+            if (TotalCustomersServed == 0 || NetProfit <= 0)
+                return 0;
+            double profitPerCustomer = (double)(NetProfit / TotalCustomersServed);
+            double kpi = (profitPerCustomer * CurrentAttractiveness) / (1 + AverageServiceSpeedMinutes * 0.1);
+
+            return Math.Round(kpi, 2);
+        }
+        public override string GetKPIDescription()
+        {
+            return $"Показник ефективності (KPI: {CalculateKPI()}) розраховується як " +
+                   $"відношення чистого середнього прибутку на одного клієнта до середньої швидкості " +
+                   $"обслуговування ({Math.Round(AverageServiceSpeedMinutes, 1)} хв), помножене на привабливість.";
+        }
+
+        public override string GetReport()
+        {
+            return $"Магазин: '{Name}'. " +
+                   $"Чистий прибуток: {NetProfit} грн. " +
+                   $"Обслуговано: {TotalCustomersServed} осіб. " +
+                   $"Зараз у черзі: {CurrentQueue} (Каса: {CashierQueue}, Видача: {KitchenQueue}). " +
+                   $"Привабливість: {Math.Round(CurrentAttractiveness, 2)}.";
+        }
     }
 }
