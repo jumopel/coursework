@@ -8,11 +8,27 @@ namespace coursework.Core
 {
     public abstract class BaseZone : FestivalElement
     {
-        public ObservableCollection<BaseShop> Shops { get; private set; }
+        private double _attractiveness;
+        private string _theme = string.Empty;
+        private int _capacity;
 
-        public double Attractiveness { get; set; }
-        public string Theme { get; set; } = string.Empty;
-        public int Capacity { get;  set; }
+        public double Attractiveness
+        {
+            get => _attractiveness;
+            set => SetProperty(ref _attractiveness, value);
+        }
+        public string Theme
+        {
+            get => _theme;
+            set => SetProperty(ref _theme, value);
+        }
+        public int Capacity
+        {
+            get => _capacity;
+            set => SetProperty(ref _capacity, value);
+        }
+
+        public ObservableCollection<BaseShop> Shops { get; private set; }
 
         public decimal TotalRevenue => Shops.Sum(s => s.Revenue);
         public decimal TotalNetProfit => Shops.Sum(s => s.NetProfit);
@@ -23,6 +39,12 @@ namespace coursework.Core
         protected BaseZone()
         {
             Shops = new ObservableCollection<BaseShop>();
+            Shops.CollectionChanged += (s, e) => {
+                OnPropertyChanged(nameof(TotalRevenue));
+                OnPropertyChanged(nameof(TotalNetProfit));
+                OnPropertyChanged(nameof(CurrentVisitors));
+                OnPropertyChanged(nameof(AverageQueueLength));
+            };
         }
         public void AddShop(BaseShop shop) =>  Shops.Add(shop);
         public void RemoveShop(BaseShop shop) => Shops.Remove(shop);
@@ -46,10 +68,10 @@ namespace coursework.Core
         public override string GetReport()
         {
             return $"Зона: '{Name}' [{Theme}]. " +
-                               $"Магазинів: {Shops.Count}. " +
-                               $"Чистий прибуток: {TotalNetProfit} грн. " +
-                               $"Людей у зоні: {CurrentVisitors}/{Capacity} (Сер. черга: {Math.Round(AverageQueueLength, 1)}). " +
-                               $"KPI: {CalculateKPI()}.";
+                   $"Магазинів: {Shops.Count}. " +
+                   $"Чистий прибуток: {TotalNetProfit} грн. " +
+                   $"Людей у зоні: {CurrentVisitors}/{Capacity} (Сер. черга: {Math.Round(AverageQueueLength, 1)}). " +
+                   $"KPI: {CalculateKPI()}.";
         }
 
 
