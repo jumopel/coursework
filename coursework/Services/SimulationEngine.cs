@@ -101,6 +101,18 @@ namespace coursework.Services
             ProcessVisitorDecisions();
             UpdateShopsAndZones();
             ProcessVisitorsStochasticExit();
+            foreach (var zone in Zones)
+            {
+                zone.CurrentVisitors = 0;
+            }
+
+            foreach (var visitor in Visitors)
+            {
+                if (visitor.CurrentZone != null)
+                {
+                    visitor.CurrentZone.CurrentVisitors++; 
+                }
+            }
             TickCompleted?.Invoke();
         }
         private void ProcessVisitorDecisions()
