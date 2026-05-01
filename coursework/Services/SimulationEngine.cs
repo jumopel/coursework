@@ -139,15 +139,21 @@ namespace coursework.Services
                     foreach (var visitor in waitingVisitors)
                     {
                         var order = visitor.MakeOrder(shop);
-
+                        shop.LeaveQueue();
                         if (order.Any())
                         {
                             decimal orderTotal = order.Sum(p => p.Price);
                             decimal orderCost = order.Sum(p => p.CostPrice);
                             double totalPrepTime = order.Sum(p => p.PreparationTime.TotalMinutes);
                             kitchen.PendingOrderTimes.Enqueue(totalPrepTime);
-                            shop.ProcessCashier(orderTotal, orderCost);
+                            shop.RegisterSale(orderTotal, orderCost);
+                            shop.JoinKitchenQueue();
                             visitor.State = Visitor.VisitorState.Eating;
+                        }
+                        else
+                        {
+                            visitor.State = Visitor.VisitorState.Searching;
+                            visitor.TargetDestination = null;
                         }
                     }
                     for (int i = kitchen.ActiveCooksRemainingTime.Count - 1; i >= 0; i--)

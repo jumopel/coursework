@@ -13,7 +13,7 @@ namespace coursework.Core
         private double _attractiveness;
         private string _theme = string.Empty;
         private int _capacity;
-
+        private int _currentVisitors;
         public double Attractiveness
         {
             get => _attractiveness;
@@ -35,7 +35,17 @@ namespace coursework.Core
         public decimal TotalRevenue => Shops.Sum(s => s.Revenue);
         public decimal TotalNetProfit => Shops.Sum(s => s.NetProfit);
 
-        public int CurrentVisitors => Shops.Sum(s => s.CurrentQueue);
+        public int CurrentVisitors
+        {
+            get => _currentVisitors;
+            set
+            {
+                if (SetProperty(ref _currentVisitors, value))
+                {
+                    OnPropertyChanged(nameof(OccupancyRate)); 
+                }
+            }
+        }
         public double AverageQueueLength => Shops.Any() ? Shops.Average(s => s.CurrentQueue) : 0;
         public double OccupancyRate => Capacity > 0 ? (double)CurrentVisitors / Capacity : 0;
         private CuisineType _zoneCuisine;

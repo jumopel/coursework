@@ -11,7 +11,7 @@ namespace coursework.Models
         public enum VisitorState { Wandering, Searching, Waiting, Eating, Leaving }
 
         private static readonly Random _rnd = new Random();
-
+        public BaseZone? CurrentZone { get; set; }
         public DietaryType DietaryPreference { get; private set; }
         public CuisineType PreferredCuisine { get; private set; }
         public double Patience { get; private set; }
@@ -60,8 +60,7 @@ namespace coursework.Models
         public BaseZone? ChooseZone(IEnumerable<BaseZone> zones)
         {
             if (zones == null || !zones.Any()) return null;
-
-            return zones.OrderByDescending(z =>
+            var bestZone = zones.OrderByDescending(z =>
             {
                 double score = z.Attractiveness;
                 if (z.ZoneCuisine == PreferredCuisine || z.ZoneCuisine == CuisineType.Universal)
@@ -71,8 +70,10 @@ namespace coursework.Models
                 score += _rnd.NextDouble() * 0.5;
                 return score;
             }).FirstOrDefault();
-        }
 
+            CurrentZone = bestZone;
+            return bestZone;
+        }
         public BaseShop? ChooseShop(BaseZone currentZone)
         {
             if (currentZone == null || !currentZone.Shops.Any()) return null;

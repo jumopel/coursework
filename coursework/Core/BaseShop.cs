@@ -171,15 +171,14 @@ namespace coursework.Core
         {
             CashierQueue++;
         }
-        public virtual void ProcessCashier(decimal orderTotal, decimal consumableCost)
+        public virtual void JoinKitchenQueue()
         {
-            if (CashierQueue > 0)
-            {
-                CashierQueue--; 
-                Revenue += orderTotal;
-                TotalConsumablesCost += consumableCost; 
-                KitchenQueue++;
-            }
+            KitchenQueue++;
+        }
+        public virtual void RegisterSale(decimal orderTotal, decimal consumableCost)
+        {
+            Revenue += orderTotal;
+            TotalConsumablesCost += consumableCost;
         }
         public virtual void LeaveQueue()
         {
