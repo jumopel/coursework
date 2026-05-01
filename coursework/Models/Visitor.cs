@@ -12,7 +12,6 @@ namespace coursework.Models
 
         private static readonly Random _rnd = new Random();
 
-        // Агентні властивості
         public DietaryType DietaryPreference { get; private set; }
         public CuisineType PreferredCuisine { get; private set; }
         public double Patience { get; private set; }
@@ -36,7 +35,6 @@ namespace coursework.Models
             get => _hunger;
             set { if (SetProperty(ref _hunger, value)) OnPropertyChanged(nameof(IsHungry)); }
         }
-
         public VisitorState State { get => _state; set => SetProperty(ref _state, value); }
 
         public decimal Balance

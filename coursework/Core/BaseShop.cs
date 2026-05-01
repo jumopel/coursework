@@ -181,6 +181,11 @@ namespace coursework.Core
                 KitchenQueue++;
             }
         }
+        public virtual void LeaveQueue()
+        {
+            if (CashierQueue > 0)  CashierQueue--;
+            
+        }
         public virtual void ProcessKitchen(double actualWaitTimeMinutes)
         {
             if (KitchenQueue > 0)

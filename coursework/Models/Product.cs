@@ -37,6 +37,7 @@ namespace coursework.Models
         private ProductCategory _category;
         private DietaryType _dietaryTag;
         private CuisineType _cuisine;
+        private decimal _costPrice;
         public Guid Id { get; } = Guid.NewGuid();
 
         public string Name
@@ -52,6 +53,15 @@ namespace coursework.Models
             {
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(Price), "Ціна не може бути від'ємною.");
                 SetProperty(ref _price, value);
+            }
+        }
+        public decimal CostPrice
+        {
+            get => _costPrice;
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(CostPrice), "Собівартість не може бути від'ємною.");
+                SetProperty(ref _costPrice, value);
             }
         }
 
@@ -81,10 +91,11 @@ namespace coursework.Models
 
         public Product() { }
 
-        public Product(string name, decimal price, TimeSpan prepTime, ProductCategory category, DietaryType dietaryTag, CuisineType cuisine)
+        public Product(string name, decimal price, decimal costPrice, TimeSpan prepTime, ProductCategory category, DietaryType dietaryTag, CuisineType cuisine)
         {
             Name = name;
             Price = price;
+            CostPrice = costPrice;
             PreparationTime = prepTime;
             Category = category;
             DietaryTag = dietaryTag;
