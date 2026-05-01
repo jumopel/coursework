@@ -1,11 +1,15 @@
-﻿using System;
+﻿using coursework.Models;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace coursework.Core
 {
     public abstract class BaseShop : FestivalElement
     {
+        public ObservableCollection<Product> Menu { get; } = new ObservableCollection<Product>();
+
         private double _baseAttractiveness = 1.0;
         private decimal _revenue;
         private decimal _totalConsumablesCost;

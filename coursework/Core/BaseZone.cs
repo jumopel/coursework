@@ -1,4 +1,5 @@
-﻿using System;
+﻿using coursework.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -37,6 +38,12 @@ namespace coursework.Core
         public int CurrentVisitors => Shops.Sum(s => s.CurrentQueue);
         public double AverageQueueLength => Shops.Any() ? Shops.Average(s => s.CurrentQueue) : 0;
         public double OccupancyRate => Capacity > 0 ? (double)CurrentVisitors / Capacity : 0;
+        private CuisineType _zoneCuisine;
+        public CuisineType ZoneCuisine
+        {
+            get => _zoneCuisine;
+            set => SetProperty(ref _zoneCuisine, value);
+        }
         protected BaseZone()
         {
             Shops = new ObservableCollection<BaseShop>();
