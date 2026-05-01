@@ -94,6 +94,7 @@ namespace coursework.Core
                 {
                     OnPropertyChanged(nameof(CurrentQueue));
                     OnPropertyChanged(nameof(CurrentAttractiveness));
+                    OnPropertyChanged(nameof(CongestionLevel));
                 }
             }
         }
@@ -142,6 +143,14 @@ namespace coursework.Core
             {
                 if (SetProperty(ref _totalWaitTimeMinutes, value))
                     OnPropertyChanged(nameof(AverageServiceSpeedMinutes));
+            }
+        }
+        public double CongestionLevel
+        {
+            get
+            {
+                int activeCashiers = CashiersCount > 0 ? CashiersCount : 1;
+                return (CashierQueue * OrderTakingTime.TotalMinutes) / activeCashiers;
             }
         }
         public double AverageServiceSpeedMinutes => TotalCustomersServed > 0 ? _totalWaitTimeMinutes / TotalCustomersServed : 0;

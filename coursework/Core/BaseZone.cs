@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -35,16 +36,42 @@ namespace coursework.Core
 
         public int CurrentVisitors => Shops.Sum(s => s.CurrentQueue);
         public double AverageQueueLength => Shops.Any() ? Shops.Average(s => s.CurrentQueue) : 0;
-
+        public double OccupancyRate => Capacity > 0 ? (double)CurrentVisitors / Capacity : 0;
         protected BaseZone()
         {
             Shops = new ObservableCollection<BaseShop>();
+
             Shops.CollectionChanged += (s, e) => {
-                OnPropertyChanged(nameof(TotalRevenue));
-                OnPropertyChanged(nameof(TotalNetProfit));
-                OnPropertyChanged(nameof(CurrentVisitors));
-                OnPropertyChanged(nameof(AverageQueueLength));
+                if (e.NewItems != null)
+                {
+                    foreach (BaseShop shop in e.NewItems)
+                        shop.PropertyChanged += Shop_PropertyChanged;
+                }
+                if (e.OldItems != null)
+                {
+                    foreach (BaseShop shop in e.OldItems)
+                        shop.PropertyChanged -= Shop_PropertyChanged;
+                }
+
+                UpdateZoneMetrics();
             };
+        }
+        private void Shop_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BaseShop.Revenue) ||
+                e.PropertyName == nameof(BaseShop.NetProfit) ||
+                e.PropertyName == nameof(BaseShop.CurrentQueue))
+            {
+                UpdateZoneMetrics();
+            }
+        }
+        private void UpdateZoneMetrics()
+        {
+            OnPropertyChanged(nameof(TotalRevenue));
+            OnPropertyChanged(nameof(TotalNetProfit));
+            OnPropertyChanged(nameof(CurrentVisitors));
+            OnPropertyChanged(nameof(AverageQueueLength));
+            OnPropertyChanged(nameof(OccupancyRate)); 
         }
         public void AddShop(BaseShop shop) =>  Shops.Add(shop);
         public void RemoveShop(BaseShop shop) => Shops.Remove(shop);
