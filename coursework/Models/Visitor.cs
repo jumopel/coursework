@@ -8,7 +8,7 @@ namespace coursework.Models
 {
     public class Visitor : ObservableObject
     {
-        public enum VisitorState { Wandering, Searching, Waiting, Eating, Leaving }
+        public enum VisitorState { Wandering, Searching, Waiting, Eating, MovingToShop, Leaving }
 
         private static readonly Random _rnd = new Random();
         public BaseZone? CurrentZone { get; set; }
@@ -17,7 +17,10 @@ namespace coursework.Models
         public double Patience { get; private set; }
         public double Satisfaction { get; private set; } = 1.0;
         public double MovementSpeed { get; private set; }
+        public double EatingTimer { get; set; }
         public bool IsHungry => Hunger > 55;
+        public double WanderTargetX { get; set; }
+        public double WanderTargetY { get; set; }
         public FestivalElement? TargetDestination { get; set; }
 
         private double _x;
@@ -96,7 +99,7 @@ namespace coursework.Models
             if (bestShop != null)
             {
                 TargetDestination = bestShop;
-                State = VisitorState.Waiting;
+                State = VisitorState.MovingToShop;
             }
 
             return bestShop;
@@ -134,17 +137,25 @@ namespace coursework.Models
                     order.Add(product);
                     SpendMoney(product.Price);
                     Hunger = Math.Max(0, Hunger - 40);
+                    if (Hunger <= 0)
+                    {
+                        Hunger = 0;
+                        break;
+                    }
                 }
             }
 
-            if (order.Any()) Satisfaction = Math.Min(1.0, Satisfaction + 0.1);
+            if (order.Any()) 
+            {
+                Satisfaction = Math.Min(1.0, Satisfaction + 0.1);
+                EatingTimer = 10.0 + _rnd.NextDouble() * 10.0;
+            }
             return order;
         }
 
         public void SpendMoney(decimal amount)
         {
             Balance -= amount;
-            if (Balance < 50) State = VisitorState.Leaving;
         }
     }
 }

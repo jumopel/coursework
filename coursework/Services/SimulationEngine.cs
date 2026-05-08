@@ -6,6 +6,7 @@ using coursework.Core;
 using coursework.Models;
 using System.Windows.Threading;
 using System.Linq;
+using System.Collections.Specialized;
 
 namespace coursework.Services
 {
@@ -18,7 +19,8 @@ namespace coursework.Services
         private double _timeScale = 1.0;
         private TimeSpan _elapsedGameTime = TimeSpan.Zero;
         private bool _isRunning;
-        private readonly Dictionary<Guid, KitchenState> _kitchenStates = new Dictionary<Guid, KitchenState>();
+        private readonly Dictionary<Guid, ShopState> _shopStates = new Dictionary<Guid, ShopState>();
+        private readonly HashSet<Guid> _visitorsToRemove = new HashSet<Guid>();
 
         public ObservableCollection<BaseZone> Zones { get; } = new ObservableCollection<BaseZone>();
         public ObservableCollection<Visitor> Visitors { get; } = new ObservableCollection<Visitor>();
@@ -54,8 +56,45 @@ namespace coursework.Services
             _simulationTimer = new DispatcherTimer();
             _simulationTimer.Interval = TimeSpan.FromMilliseconds(BaseIntervalMs);
             _simulationTimer.Tick += OnTimerElapsed;
+            Zones.CollectionChanged += OnZonesCollectionChanged;
         }
 
+        private void OnZonesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (BaseZone zone in e.NewItems)
+                {
+                    zone.Shops.CollectionChanged += OnShopsCollectionChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (BaseZone zone in e.OldItems)
+                {
+                    zone.Shops.CollectionChanged -= OnShopsCollectionChanged;
+                    foreach (var shop in zone.Shops)
+                    {
+                        _shopStates.Remove(shop.Id);
+                    }
+                }
+            }
+        }
+
+        private void OnShopsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (BaseShop shop in e.OldItems)
+                {
+                    if (_shopStates.ContainsKey(shop.Id))
+                    {
+                        _shopStates.Remove(shop.Id);
+                    }
+                }
+            }
+        }
         private void UpdateTimerInterval()
         {
             if (_timeScale > 0)
@@ -97,22 +136,29 @@ namespace coursework.Services
         private void OnTimerElapsed(object? sender, EventArgs e)
         {
             ElapsedGameTime = ElapsedGameTime.Add(TimeSpan.FromMinutes(GameMinutesPerTick));
+
+            _visitorsToRemove.Clear();
+
             GenerateNewVisitors();
             ProcessVisitorDecisions();
-            UpdateShopsAndZones();
+            ProcessPhysicalMovement();      
+            UpdateShopsAndZones();          
             ProcessVisitorsStochasticExit();
-            foreach (var zone in Zones)
+            for (int i = Visitors.Count - 1; i >= 0; i--)
             {
-                zone.CurrentVisitors = 0;
+                if (_visitorsToRemove.Contains(Visitors[i].Id))
+                    Visitors.RemoveAt(i);
             }
+
+            foreach (var zone in Zones)
+                zone.CurrentVisitors = 0;
 
             foreach (var visitor in Visitors)
             {
                 if (visitor.CurrentZone != null)
-                {
-                    visitor.CurrentZone.CurrentVisitors++; 
-                }
+                    visitor.CurrentZone.CurrentVisitors++;
             }
+
             TickCompleted?.Invoke();
         }
         private void ProcessVisitorDecisions()
@@ -124,10 +170,11 @@ namespace coursework.Services
                     var zone = visitor.ChooseZone(Zones);
                     if (zone != null)
                     {
-                        var shop = visitor.ChooseShop(zone);
+                        var shop = visitor.ChooseShop(zone); 
                         if (shop != null)
                         {
-                            shop.JoinQueue();
+                            visitor.TargetDestination = shop;
+                            visitor.State = Visitor.VisitorState.MovingToShop;
                         }
                     }
                 }
@@ -139,92 +186,119 @@ namespace coursework.Services
             {
                 foreach (var shop in zone.Shops)
                 {
-                    if (!_kitchenStates.ContainsKey(shop.Id))
-                        _kitchenStates[shop.Id] = new KitchenState();
+                    if (!_shopStates.ContainsKey(shop.Id))
+                        _shopStates[shop.Id] = new ShopState();
 
-                    var kitchen = _kitchenStates[shop.Id];
-                    var waitingVisitors = Visitors
-                        .Where(v => v.TargetDestination == shop && v.State == Visitor.VisitorState.Waiting)
-                        .Take(shop.CashiersCount) 
-                        .ToList();
+                    var state = _shopStates[shop.Id];
 
-                    foreach (var visitor in waitingVisitors)
+                    for (int i = state.ActiveCashiersRemainingTime.Count - 1; i >= 0; i--)
                     {
-                        var order = visitor.MakeOrder(shop);
-                        shop.LeaveQueue();
-                        if (order.Any())
+                        state.ActiveCashiersRemainingTime[i] -= GameMinutesPerTick;
+                        if (state.ActiveCashiersRemainingTime[i] <= 0)
                         {
-                            decimal orderTotal = order.Sum(p => p.Price);
-                            decimal orderCost = order.Sum(p => p.CostPrice);
-                            double totalPrepTime = order.Sum(p => p.PreparationTime.TotalMinutes);
-                            kitchen.PendingOrderTimes.Enqueue(totalPrepTime);
-                            shop.RegisterSale(orderTotal, orderCost);
-                            shop.JoinKitchenQueue();
-                            visitor.State = Visitor.VisitorState.Eating;
-                        }
-                        else
-                        {
-                            visitor.State = Visitor.VisitorState.Searching;
-                            visitor.TargetDestination = null;
-                        }
-                    }
-                    for (int i = kitchen.ActiveCooksRemainingTime.Count - 1; i >= 0; i--)
-                    {
-                        kitchen.ActiveCooksRemainingTime[i] -= GameMinutesPerTick;
-
-                        if (kitchen.ActiveCooksRemainingTime[i] <= 0)
-                        {
-                            kitchen.ActiveCooksRemainingTime.RemoveAt(i);
-                            shop.ProcessKitchen(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes);
+                            state.ActiveCashiersRemainingTime.RemoveAt(i);
                         }
                     }
 
-                    int availableCooks = shop.CooksCount - kitchen.ActiveCooksRemainingTime.Count;
-                    while (availableCooks > 0 && kitchen.PendingOrderTimes.Count > 0)
+                    int availableCashiers = shop.CashiersCount - state.ActiveCashiersRemainingTime.Count;
+
+                    if (availableCashiers > 0)
                     {
-                        kitchen.ActiveCooksRemainingTime.Add(kitchen.PendingOrderTimes.Dequeue());
-                        availableCooks--;
+                        var waitingVisitors = Visitors
+                            .Where(v => v.TargetDestination == shop && v.State == Visitor.VisitorState.Waiting)
+                            .Take(availableCashiers)
+                            .ToList();
+
+                        foreach (var visitor in waitingVisitors)
+                        {
+                            state.ActiveCashiersRemainingTime.Add(shop.OrderTakingTime.TotalMinutes);
+
+                            var order = visitor.MakeOrder(shop);
+
+                            if (order.Any())
+                            {
+                                shop.LeaveQueue(); 
+                                decimal orderTotal = order.Sum(p => p.Price);
+                                decimal orderCost = order.Sum(p => p.CostPrice);
+                                double totalPrepTime = order.Sum(p => p.PreparationTime.TotalMinutes);
+                                state.PendingOrderTimes.Enqueue(totalPrepTime);
+                                shop.RegisterSale(orderTotal, orderCost);
+                                shop.JoinKitchenQueue();
+
+                                visitor.State = Visitor.VisitorState.Eating;
+                            }
+                            else
+                            {
+                                shop.LeaveQueue();
+                                state.ActiveCashiersRemainingTime.RemoveAt(
+                                state.ActiveCashiersRemainingTime.Count - 1); 
+                                visitor.State = Visitor.VisitorState.Searching;
+                                visitor.TargetDestination = null;
+                                visitor.DecreaseSatisfaction(0.15);
+                            }
+                        }
+
+                        for (int i = state.ActiveCooksRemainingTime.Count - 1; i >= 0; i--)
+                        {
+                            state.ActiveCooksRemainingTime[i] -= GameMinutesPerTick;
+
+                            if (state.ActiveCooksRemainingTime[i] <= 0)
+                            {
+                                state.ActiveCooksRemainingTime.RemoveAt(i);
+                                shop.ProcessKitchen(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes);
+                            }
+                        }
+                        int availableCooks = shop.CooksCount - state.ActiveCooksRemainingTime.Count;
+                        while (availableCooks > 0 && state.PendingOrderTimes.Count > 0)
+                        {
+                            state.ActiveCooksRemainingTime.Add(state.PendingOrderTimes.Dequeue());
+                            availableCooks--;
+                        }
                     }
                 }
             }
         }
+           
 
         private void ProcessVisitorsStochasticExit()
         {
-            const double exitGateX = 0.0;
-            const double exitGateY = 0.0;
-
-            for (int i = Visitors.Count - 1; i >= 0; i--)
+            foreach (var visitor in Visitors)
             {
-                var visitor = Visitors[i];
-                if (visitor.State == Visitor.VisitorState.Leaving)
-                {
-                    MoveTowards(visitor, exitGateX, exitGateY);
+                if (_visitorsToRemove.Contains(visitor.Id)) continue;
 
-                    double distToExit = Math.Sqrt(Math.Pow(exitGateX - visitor.X, 2) + Math.Pow(exitGateY - visitor.Y, 2));
-                    if (distToExit < 5.0)
-                    {
-                        Visitors.RemoveAt(i);
-                    }
+                if (visitor.State == Visitor.VisitorState.Leaving)
+                    continue; 
+
+                if (visitor.State != Visitor.VisitorState.Eating)
+                    visitor.Hunger += 0.8;
+
+                if (visitor.State == Visitor.VisitorState.Eating)
+                {
+                    visitor.EatingTimer -= GameMinutesPerTick;
+                    if (visitor.EatingTimer <= 0)
+                        visitor.State = visitor.Balance < 50
+                            ? Visitor.VisitorState.Leaving
+                            : Visitor.VisitorState.Wandering;
                     continue;
                 }
-                if (visitor.State != Visitor.VisitorState.Eating) visitor.Hunger += 0.8;
-                if (visitor.State == Visitor.VisitorState.Eating) continue;
-                if (visitor.State == Visitor.VisitorState.Waiting && visitor.TargetDestination is BaseShop shop)
-                {
-                    if (shop.CashierQueue < 4)
-                        continue;
-                }
+
+                if (visitor.State == Visitor.VisitorState.Waiting
+                    && visitor.TargetDestination is BaseShop waitShop
+                    && waitShop.CashierQueue < 4)
+                    continue;
+
                 double exitProbability = 0.01;
-                if (visitor.Hunger > 100) exitProbability += 0.04;
+                if (visitor.Hunger  > 100) exitProbability += 0.04;
                 if (visitor.Balance < 20) exitProbability += 0.2;
+
                 if (_random.NextDouble() <= exitProbability)
                 {
                     visitor.State = Visitor.VisitorState.Leaving;
-                    if (visitor.TargetDestination is BaseShop abandonedShop && abandonedShop.CashierQueue > 0)
-                    {
+
+                    if (visitor.TargetDestination is BaseShop abandonedShop
+                        && abandonedShop.CashierQueue > 0)
                         abandonedShop.LeaveQueue();
-                    }
+
                     visitor.TargetDestination = null;
                 }
             }
@@ -272,10 +346,100 @@ namespace coursework.Services
                 visitor.Y += moveY;
             }
         }
-        private class KitchenState
+            private void ProcessPhysicalMovement()
+            {
+                const double exitGateX = 0.0;
+                const double exitGateY = 0.0;
+                const double mapWidth = 800.0;
+                const double mapHeight = 600.0;
+                const double shopRadius = 40.0;
+
+                foreach (var visitor in Visitors)
+                {
+                    if (_visitorsToRemove.Contains(visitor.Id)) continue;
+
+                    if (visitor.State == Visitor.VisitorState.Leaving)
+                    {
+                        MoveTowards(visitor, exitGateX, exitGateY);
+
+                        double distToExit = Math.Sqrt(
+                            Math.Pow(exitGateX - visitor.X, 2) +
+                            Math.Pow(exitGateY - visitor.Y, 2));
+
+                        if (distToExit < 5.0)
+                            _visitorsToRemove.Add(visitor.Id); 
+
+                        continue; 
+                    }
+
+                    if (visitor.State == Visitor.VisitorState.MovingToShop
+                        && visitor.TargetDestination is BaseShop targetShop)
+                    {
+                        MoveTowards(visitor, targetShop.X, targetShop.Y);
+
+                        double distToShop = Math.Sqrt(
+                            Math.Pow(targetShop.X - visitor.X, 2) +
+                            Math.Pow(targetShop.Y - visitor.Y, 2));
+
+                        if (distToShop <= shopRadius + 2.0)
+                        {
+                            visitor.State = Visitor.VisitorState.Waiting;
+                            targetShop.JoinQueue();
+                        }
+                    }
+                    else if (visitor.State == Visitor.VisitorState.Wandering)
+                    {
+                        double distToWander = Math.Sqrt(
+                            Math.Pow(visitor.WanderTargetX - visitor.X, 2) +
+                            Math.Pow(visitor.WanderTargetY - visitor.Y, 2));
+
+                        if (distToWander < 5.0
+                            || (visitor.WanderTargetX == 0 && visitor.WanderTargetY == 0))
+                        {
+                            visitor.WanderTargetX = _random.NextDouble() * mapWidth;
+                            visitor.WanderTargetY = _random.NextDouble() * mapHeight;
+                        }
+
+                        MoveTowards(visitor, visitor.WanderTargetX, visitor.WanderTargetY);
+                    }
+
+                    foreach (var zone in Zones)
+                    {
+                        foreach (var shop in zone.Shops)
+                        {
+                            if ((visitor.State == Visitor.VisitorState.MovingToShop
+                                 || visitor.State == Visitor.VisitorState.Waiting)
+                                && visitor.TargetDestination == shop)
+                                continue;
+
+                            double dx = visitor.X - shop.X;
+                            double dy = visitor.Y - shop.Y;
+                            double distance = Math.Sqrt(dx * dx + dy * dy);
+
+                            if (distance < shopRadius)
+                            {
+                                if (distance == 0) { dx = 1; distance = 1; }
+                                double overlap = shopRadius - distance;
+                                visitor.X += (dx / distance) * overlap;
+                                visitor.Y += (dy / distance) * overlap;
+
+                                if (visitor.State == Visitor.VisitorState.Wandering)
+                                {
+                                    visitor.WanderTargetX = _random.NextDouble() * mapWidth;
+                                    visitor.WanderTargetY = _random.NextDouble() * mapHeight;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        private class ShopState
         {
             public Queue<double> PendingOrderTimes { get; } = new Queue<double>();
             public List<double> ActiveCooksRemainingTime { get; } = new List<double>();
+            public List<double> ActiveCashiersRemainingTime { get; } = new List<double>();
         }
     }
 }

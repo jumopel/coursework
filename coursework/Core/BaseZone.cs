@@ -27,7 +27,13 @@ namespace coursework.Core
         public int Capacity
         {
             get => _capacity;
-            set => SetProperty(ref _capacity, value);
+            set
+            {
+                if (SetProperty(ref _capacity, value))
+                {
+                    OnPropertyChanged(nameof(OccupancyRate)); 
+                }
+            }
         }
 
         public ObservableCollection<BaseShop> Shops { get; private set; }
@@ -86,9 +92,7 @@ namespace coursework.Core
         {
             OnPropertyChanged(nameof(TotalRevenue));
             OnPropertyChanged(nameof(TotalNetProfit));
-            OnPropertyChanged(nameof(CurrentVisitors));
             OnPropertyChanged(nameof(AverageQueueLength));
-            OnPropertyChanged(nameof(OccupancyRate)); 
         }
         public void AddShop(BaseShop shop) =>  Shops.Add(shop);
         public void RemoveShop(BaseShop shop) => Shops.Remove(shop);

@@ -9,6 +9,8 @@ namespace coursework.Core
         private string _name = string.Empty;
         private string _description = string.Empty;
         public Guid Id { get; set; } = Guid.NewGuid();
+        public double X { get; set; }
+        public double Y { get; set; }
         public string Description
         {
             get => _description;
