@@ -9,7 +9,7 @@ namespace coursework.Models
     {
         public RestaurantShop()
         {
-            BaseAttractiveness = 1.5;
+            BaseAttractiveness = 1.1;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace coursework.ViewModels
         private double _currentSpeed = 1.0;
 
         public ObservableCollection<ZoneStateDto> Zones { get; } = new ObservableCollection<ZoneStateDto>();
+        public ICommand OpenMapCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -58,6 +59,11 @@ namespace coursework.ViewModels
             SetSpeed1XCommand = new RelayCommand(_ => ChangeSpeed(1.0));
             SetSpeed2XCommand = new RelayCommand(_ => ChangeSpeed(2.0));
             SetSpeed4XCommand = new RelayCommand(_ => ChangeSpeed(4.0));
+            OpenMapCommand = new RelayCommand(_ =>
+            {
+                var mapWindow = new coursework.Views.MapWindow(_engine);
+                mapWindow.Show();
+            });
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
             InitializeDemoData();
             UpdateSnapshot();
@@ -110,7 +116,7 @@ namespace coursework.ViewModels
             );
 
             _dataService.AddProductToShop(burgerShop, "Краш Бургер XXL", 145, 55, TimeSpan.FromMinutes(3), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.American);
-            _dataService.AddProductToShop(burgerShop, "Картопля Фрі", 65, 18, TimeSpan.FromMinutes(2), ProductCategory.Snack, DietaryType.Standard, CuisineType.Universal);
+            _dataService.AddProductToShop(burgerShop, "Картопля Фрі", 65, 18, TimeSpan.FromMinutes(2), ProductCategory.Snack, DietaryType.Vegetarian, CuisineType.Universal);
             _dataService.AddProductToShop(burgerShop, "Фірмовий Лимонад", 45, 12, TimeSpan.FromMinutes(0.5), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
 
             var pizzaShop = _dataService.CreateShop(
@@ -126,9 +132,9 @@ namespace coursework.ViewModels
                 type: ShopType.Restaurant
             );
 
-            _dataService.AddProductToShop(pizzaShop, "Піца Маргарита", 240, 85, TimeSpan.FromMinutes(6), ProductCategory.MainCourse, DietaryType.Vegetarian, CuisineType.Italian);
-            _dataService.AddProductToShop(pizzaShop, "Піца Пепероні", 280, 110, TimeSpan.FromMinutes(7), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.Italian);
-            _dataService.AddProductToShop(pizzaShop, "Сік прямого віджиму", 50, 20, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
+            _dataService.AddProductToShop(pizzaShop, "Піца Маргарита", 300, 85, TimeSpan.FromMinutes(6), ProductCategory.MainCourse, DietaryType.Vegetarian, CuisineType.Italian);
+            _dataService.AddProductToShop(pizzaShop, "Піца Пепероні", 340, 110, TimeSpan.FromMinutes(7), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.Italian);
+            _dataService.AddProductToShop(pizzaShop, "Сік прямого віджиму", 100, 20, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
             foodZone.AddShop(burgerShop);
             foodZone.AddShop(pizzaShop);
             _engine.Zones.Add(foodZone);

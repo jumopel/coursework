@@ -4,7 +4,7 @@ using System.Text;
 
 namespace coursework.DTO
 {
-    internal class ZoneStateDto
+    public class ZoneStateDto
     {
         public Guid ZoneId { get; set; }
         public string ZoneName { get; set; }

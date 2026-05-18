@@ -1,9 +1,10 @@
-﻿using System;
+﻿using coursework.Core;
+using coursework.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using coursework.Core;
-using coursework.Models;
+using static coursework.Core.BaseShop;
 
 namespace coursework.Services
 {
@@ -21,20 +22,20 @@ namespace coursework.Services
             };
             return zone;
         }
-        public BaseShop CreateShop(string name, int cashiers, int cooks, decimal rent, decimal salary, double orderTakingMinutes, double prepMinutes, double x, double y)
+        public BaseShop CreateShop(string name, ShopType type, int cashiers, int cooks, decimal rent, decimal salary, double orderTakingMinutes, double prepMinutes, double x, double y)
         {
-            var shop = new FastFoodShop
-            {
-                Name = name,
-                X = x,
-                Y = y,
-                CashiersCount = cashiers,
-                CooksCount = cooks,
-                DailyRent = rent,
-                StaffsDailySalary = salary,
-                OrderTakingTime = TimeSpan.FromMinutes(orderTakingMinutes),
-                FoodPreparationTime = TimeSpan.FromMinutes(prepMinutes)
-            };
+            BaseShop shop = type == ShopType.FastFood ? new FastFoodShop() : new RestaurantShop();
+
+            shop.Name = name;
+            shop.X = x;
+            shop.Y = y;
+            shop.CashiersCount = cashiers;
+            shop.CooksCount = cooks;
+            shop.DailyRent = rent;
+            shop.StaffsDailySalary = salary;
+            shop.OrderTakingTime = TimeSpan.FromMinutes(orderTakingMinutes);
+            shop.FoodPreparationTime = TimeSpan.FromMinutes(prepMinutes);
+
             return shop;
         }
         public void AddProductToShop(BaseShop shop, string name, decimal price, decimal cost,

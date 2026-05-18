@@ -4,7 +4,7 @@ using System.Text;
 
 namespace coursework.DTO
 {
-    internal class ShopStateDto
+    public class ShopStateDto
     {
         public Guid ShopId { get; set; }
         public string ShopName { get; set; }

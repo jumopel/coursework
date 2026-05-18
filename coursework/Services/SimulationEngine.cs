@@ -10,11 +10,11 @@ using System.Collections.Specialized;
 
 namespace coursework.Services
 {
-    internal class SimulationEngine : ObservableObject
+    public class SimulationEngine : ObservableObject
     {
         private readonly DispatcherTimer _simulationTimer;
         private readonly Random _random = new Random();
-        private const double BaseIntervalMs = 1000.0;
+        private const double BaseIntervalMs = 100.0;
         public const double GameMinutesPerTick = 2.0;
         private double _timeScale = 1.0;
         private TimeSpan _elapsedGameTime = TimeSpan.Zero;
@@ -242,7 +242,7 @@ namespace coursework.Services
                     {
                          state.ActiveCooksRemainingTime[i] -= GameMinutesPerTick;
 
-                        if (state.ActiveCooksRemainingTime[i] <= 0)
+                        if (state.ActiveCooksRemainingTime[i] <= 0) 
                         {
                            state.ActiveCooksRemainingTime.RemoveAt(i);
                            shop.ProcessKitchen(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes);
@@ -315,7 +315,7 @@ namespace coursework.Services
                 {
                     if (Visitors.Count >= maxCapacity) break;
 
-                    decimal initialBalance = _random.Next(150, 5000);
+                    decimal initialBalance = _random.Next(150, 1000);
                     Array diets = Enum.GetValues(typeof(DietaryType));
                     DietaryType randomDiet = _random.NextDouble() > 0.3
                         ? DietaryType.Standard

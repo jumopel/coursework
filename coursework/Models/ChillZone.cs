@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using coursework.Core;
 
 namespace coursework.Models
 {
-    public class ChillZone
+    public class ChillZone : BaseZone
     {
+        public ChillZone()
+        {
+            Attractiveness = 0.8;
+        }
     }
 }
