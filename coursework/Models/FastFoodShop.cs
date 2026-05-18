@@ -7,5 +7,9 @@ namespace coursework.Models
 {
     public class FastFoodShop : BaseShop
     {
+        public FastFoodShop()
+        {
+            BaseAttractiveness = 0.8;  
+        }
     }
 }

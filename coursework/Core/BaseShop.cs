@@ -8,6 +8,7 @@ namespace coursework.Core
 {
     public abstract class BaseShop : FestivalElement
     {
+        public enum ShopType { FastFood, Restaurant }
         public ObservableCollection<Product> Menu { get; } = new ObservableCollection<Product>();
 
         private double _baseAttractiveness = 1.0;
@@ -16,7 +17,6 @@ namespace coursework.Core
         private decimal _averageCheck;
         private decimal _dailyRent;
         private decimal _staffsDailySalary;
-        private double _marginMultiplier;
 
         private int _cashiersCount;
         private int _cooksCount;

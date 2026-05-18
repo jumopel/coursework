@@ -86,22 +86,7 @@ namespace coursework.Models
                     (DietaryPreference == DietaryType.Standard || p.DietaryTag == DietaryPreference) &&
                     p.Price <= Balance)
             ).ToList();
-
-            if (!suitableShops.Any())
-            {
-                Satisfaction -= 0.2;
-                State = (Satisfaction < 0.4 || Balance < 50) ? VisitorState.Leaving : VisitorState.Searching;
-                return null;
-            }
-
             var bestShop = suitableShops.OrderByDescending(CalculateShopScore).FirstOrDefault();
-
-            if (bestShop != null)
-            {
-                TargetDestination = bestShop;
-                State = VisitorState.MovingToShop;
-            }
-
             return bestShop;
         }
 
@@ -156,6 +141,10 @@ namespace coursework.Models
         public void SpendMoney(decimal amount)
         {
             Balance -= amount;
+        }
+        public void DecreaseSatisfaction(double amount)
+        {
+            Satisfaction = Math.Max(0, Satisfaction - amount);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace coursework.Services
                 Theme = theme,
                 Capacity = capacity,
                 ZoneCuisine = cuisine,
-                Attractiveness = 1.0 
+                Attractiveness = 1.0
             };
             return zone;
         }
@@ -37,19 +37,21 @@ namespace coursework.Services
             };
             return shop;
         }
-        public void AddProductToShop(BaseShop shop, string name, decimal price, decimal cost)
+        public void AddProductToShop(BaseShop shop, string name, decimal price, decimal cost,
+          TimeSpan preparationTime, ProductCategory category = ProductCategory.MainCourse,
+          DietaryType dietaryType = DietaryType.Standard, CuisineType cuisineType = CuisineType.Universal)
         {
             var product = new Product(
                 name,
                 price,
                 cost,
-                TimeSpan.FromMinutes(5), 
-                ProductCategory.MainCourse,
-                DietaryType.Standard,
-                CuisineType.Universal
+                preparationTime,
+                category,
+                dietaryType,
+                cuisineType
             );
             shop.Menu.Add(product);
         }
-       
+
     }
 }

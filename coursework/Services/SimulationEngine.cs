@@ -217,7 +217,7 @@ namespace coursework.Services
 
                             if (order.Any())
                             {
-                                shop.LeaveQueue(); 
+                                shop.LeaveQueue();
                                 decimal orderTotal = order.Sum(p => p.Price);
                                 decimal orderCost = order.Sum(p => p.CostPrice);
                                 double totalPrepTime = order.Sum(p => p.PreparationTime.TotalMinutes);
@@ -231,30 +231,30 @@ namespace coursework.Services
                             {
                                 shop.LeaveQueue();
                                 state.ActiveCashiersRemainingTime.RemoveAt(
-                                state.ActiveCashiersRemainingTime.Count - 1); 
+                                state.ActiveCashiersRemainingTime.Count - 1);
                                 visitor.State = Visitor.VisitorState.Searching;
                                 visitor.TargetDestination = null;
                                 visitor.DecreaseSatisfaction(0.15);
                             }
                         }
+                    }
+                    for (int i = state.ActiveCooksRemainingTime.Count - 1; i >= 0; i--)
+                    {
+                         state.ActiveCooksRemainingTime[i] -= GameMinutesPerTick;
 
-                        for (int i = state.ActiveCooksRemainingTime.Count - 1; i >= 0; i--)
+                        if (state.ActiveCooksRemainingTime[i] <= 0)
                         {
-                            state.ActiveCooksRemainingTime[i] -= GameMinutesPerTick;
-
-                            if (state.ActiveCooksRemainingTime[i] <= 0)
-                            {
-                                state.ActiveCooksRemainingTime.RemoveAt(i);
-                                shop.ProcessKitchen(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes);
-                            }
-                        }
-                        int availableCooks = shop.CooksCount - state.ActiveCooksRemainingTime.Count;
-                        while (availableCooks > 0 && state.PendingOrderTimes.Count > 0)
-                        {
-                            state.ActiveCooksRemainingTime.Add(state.PendingOrderTimes.Dequeue());
-                            availableCooks--;
+                           state.ActiveCooksRemainingTime.RemoveAt(i);
+                           shop.ProcessKitchen(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes);
                         }
                     }
+                    int availableCooks = shop.CooksCount - state.ActiveCooksRemainingTime.Count;
+                    while (availableCooks > 0 && state.PendingOrderTimes.Count > 0)
+                    {
+                        state.ActiveCooksRemainingTime.Add(state.PendingOrderTimes.Dequeue());
+                        availableCooks--;
+                    }
+                    
                 }
             }
         }
