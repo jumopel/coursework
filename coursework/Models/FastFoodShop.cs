@@ -9,7 +9,7 @@ namespace coursework.Models
     {
         public FastFoodShop()
         {
-            BaseAttractiveness = 0.8;  
+            BaseAttractiveness = 0.9;  
         }
     }
 }

@@ -14,8 +14,8 @@ namespace coursework.Services
     {
         private readonly DispatcherTimer _simulationTimer;
         private readonly Random _random = new Random();
-        private const double BaseIntervalMs = 100.0;
-        public const double GameMinutesPerTick = 2.0;
+        private const double BaseIntervalMs = 1000.0;
+        public const double GameMinutesPerTick = 0.5;
         private double _timeScale = 1.0;
         private TimeSpan _elapsedGameTime = TimeSpan.Zero;
         private bool _isRunning;
@@ -267,10 +267,9 @@ namespace coursework.Services
                 if (_visitorsToRemove.Contains(visitor.Id)) continue;
 
                 if (visitor.State == Visitor.VisitorState.Leaving)
-                    continue; 
-
+                    continue;
                 if (visitor.State != Visitor.VisitorState.Eating)
-                    visitor.Hunger += 0.8;
+                    visitor.Hunger += 1.5;
 
                 if (visitor.State == Visitor.VisitorState.Eating)
                 {
@@ -287,7 +286,7 @@ namespace coursework.Services
                     && waitShop.CashierQueue < 4)
                     continue;
 
-                double exitProbability = 0.01;
+                double exitProbability = 0.001;
                 if (visitor.Hunger  > 100) exitProbability += 0.04;
                 if (visitor.Balance < 20) exitProbability += 0.2;
 
@@ -325,8 +324,8 @@ namespace coursework.Services
 
                     CuisineType randomCuisine = (CuisineType)cuisines.GetValue(_random.Next(cuisines.Length));
 
-                    double startX = 0.0;
-                    double startY = 0.0;
+                    double startX = 400.0 + (_random.NextDouble() * 60 - 30);
+                    double startY = 590.0;
                     var newVisitor = new Visitor(initialBalance, randomDiet, randomCuisine, startX, startY);
                     Visitors.Add(newVisitor);
                 }
@@ -340,17 +339,20 @@ namespace coursework.Services
 
             if (distance > 0)
             {
-                double moveX = (dx / distance) * visitor.MovementSpeed;
-                double moveY = (dy / distance) * visitor.MovementSpeed;
+                double actualSpeed = visitor.MovementSpeed * 8.0;
+                if (actualSpeed > distance) actualSpeed = distance;
+
+                double moveX = (dx / distance) * actualSpeed;
+                double moveY = (dy / distance) * actualSpeed;
                 visitor.X += moveX;
                 visitor.Y += moveY;
             }
         }
-            private void ProcessPhysicalMovement()
+        private void ProcessPhysicalMovement()
             {
-                const double exitGateX = 0.0;
-                const double exitGateY = 0.0;
-                const double mapWidth = 800.0;
+            const double exitGateX = 400.0;
+            const double exitGateY = 610.0;
+            const double mapWidth = 800.0;
                 const double mapHeight = 600.0;
                 const double shopRadius = 40.0;
 

@@ -83,8 +83,7 @@ namespace coursework.ViewModels
         private void UpdateSnapshot()
         {
             IsSimulationRunning = _engine.IsRunning;
-            ElapsedTimeText = string.Format("{0:00}:{1:00}", (int)_engine.ElapsedGameTime.TotalHours, _engine.ElapsedGameTime.Minutes);
-
+            ElapsedTimeText = $"{(int)_engine.ElapsedGameTime.TotalHours:00}:{_engine.ElapsedGameTime.Minutes:00}";
             var freshZonesSnapshot = _dataProvider.GetZonesSnapshot().ToList();
             Zones.Clear();
             foreach (var zoneDto in freshZonesSnapshot)

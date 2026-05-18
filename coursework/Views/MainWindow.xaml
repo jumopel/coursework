@@ -54,7 +54,7 @@
 
                     <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" 
                             Width="150" Height="35" Margin="15,0,0,0" 
-                            Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                            Background="#2980B9" Foreground="White" FontWeight="Bold"    BorderThickness="0">
                         <Button.Effect>
                             <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="4" ShadowDepth="1"/>
                         </Button.Effect>
@@ -66,14 +66,14 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Zones}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" RowDetailsVisibilityMode="VisibleWhenSelected"
                   Background="White" BorderBrush="#E0E0E0" BorderThickness="1" HeadersVisibility="Column"
-                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EEEEEE">
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EEEEEE" SelectionChanged="DataGrid_SelectionChanged_1">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Назва Зони" Binding="{Binding ZoneName}" Width="2*"/>
                 <DataGridTextColumn Header="Тематика" Binding="{Binding Theme}" Width="2*"/>
                 <DataGridTextColumn Header="Людей" Binding="{Binding CurrentVisitors}" Width="Auto"/>
                 <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
-                <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="1.5*"/>
+                <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
             </DataGrid.Columns>
 
             <DataGrid.RowDetailsTemplate>
@@ -86,11 +86,11 @@
                                       CanUserAddRows="False" IsReadOnly="True" 
                                       Background="White" BorderThickness="1" BorderBrush="#D0D3D4">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Назва Закладу" Binding="{Binding ShopName}" Width="2*"/>
+                                    <DataGridTextColumn Header="Назва Закладу" Binding="{Binding ShopName}" Width="Auto"/>
                                     <DataGridTextColumn Header="Черга (людей)" Binding="{Binding CurrentQueue}" Width="Auto"/>
                                     <DataGridTextColumn Header="Завантаженість (хв)" Binding="{Binding CongestionLevel}" Width="Auto"/>
                                     <DataGridTextColumn Header="Привабливість" Binding="{Binding Attractiveness}" Width="Auto"/>
-                                    <DataGridTextColumn Header="Каса (грн)" Binding="{Binding CurrentRevenue}" Width="1.5*"/>
+                                    <DataGridTextColumn Header="Каса (грн)" Binding="{Binding CurrentRevenue}" Width="Auto"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
