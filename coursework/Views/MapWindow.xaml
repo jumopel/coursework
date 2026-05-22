@@ -47,7 +47,9 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <Canvas Background="Transparent" MouseMove="Canvas_MouseMove" MouseLeftButtonDown="Canvas_MouseLeftButtonDown">
+            <Canvas Background="Transparent" 
+        MouseMove="Canvas_MouseMove" 
+        MouseLeftButtonUp="Canvas_MouseLeftButtonUp">
                 <Border x:Name="PlacementPreview" 
                         Width="{Binding ZoneToPlace.Width}" 
                         Height="{Binding ZoneToPlace.Height}" 

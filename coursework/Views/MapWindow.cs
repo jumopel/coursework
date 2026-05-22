@@ -32,7 +32,7 @@ namespace coursework.Views
             }
         }
 
-        private void Canvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Canvas_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (DataContext is MapViewModel vm)
             {
@@ -43,20 +43,40 @@ namespace coursework.Views
                     vm.ZoneToPlace.X = pos.X - vm.ZoneToPlace.Width / 2;
                     vm.ZoneToPlace.Y = pos.Y - vm.ZoneToPlace.Height / 2;
                     vm.Zones.Add(vm.ZoneToPlace);
+
                     vm.IsPlacingZone = false;
+                    e.Handled = true; 
                 }
                 else if (vm.IsPlacingShop && vm.ShopToPlace != null)
                 {
-                    vm.ShopToPlace.X = pos.X;
-                    vm.ShopToPlace.Y = pos.Y;
+                    var targetZone = vm.Zones.FirstOrDefault(z =>
+                        pos.X >= z.X && pos.X <= (z.X + z.Width) &&
+                        pos.Y >= z.Y && pos.Y <= (z.Y + z.Height));
 
-                    var targetZone = vm.Zones.FirstOrDefault(z => z.Name == vm.TargetZoneName);
                     if (targetZone != null)
                     {
-                        targetZone.AddShop(vm.ShopToPlace);
-                    }
+                        vm.ShopToPlace.X = pos.X;
+                        vm.ShopToPlace.Y = pos.Y;
+                        vm.ShopToPlace.ShopCuisine = targetZone.ZoneCuisine;
+                        var dataService = new coursework.Services.DataService(); 
+                        dataService.InitializeDefaultMenu(vm.ShopToPlace, targetZone.ZoneCuisine);
 
-                    vm.IsPlacingShop = false;
+                        targetZone.AddShop(vm.ShopToPlace);
+
+                        vm.IsPlacingShop = false;
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        vm.IsPlacingShop = false;
+                        e.Handled = true;
+
+                        System.Windows.MessageBox.Show(
+                            "Заклад не додано: ви клікнули повз зону. Спробуйте ще раз.",
+                            "Скасовано",
+                            System.Windows.MessageBoxButton.OK,
+                            System.Windows.MessageBoxImage.Information);
+                    }
                 }
             }
         }

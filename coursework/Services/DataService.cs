@@ -23,16 +23,16 @@ namespace coursework.Services
             };
             return zone;
         }
-        public BaseShop CreateShop(string name, ShopType type, int cashiers, int cooks, decimal rent, decimal salary, double orderTakingMinutes, double prepMinutes, double x, double y)
+        public BaseShop CreateShop(string name, int cashiers, int cooks, decimal rent, decimal salary, double orderTakingMinutes, double prepMinutes, double x, double y)
         {
-            BaseShop shop = type == ShopType.FastFood ? new FastFoodShop() : new RestaurantShop();
+            BaseShop shop = new BaseShop();
 
             shop.Name = name;
             shop.X = x;
             shop.Y = y;
             shop.CashiersCount = cashiers;
             shop.CooksCount = cooks;
-            shop.DailyRent = rent;
+            shop.BaseRent = rent;
             shop.StaffsDailySalary = salary;
             shop.OrderTakingTime = TimeSpan.FromMinutes(orderTakingMinutes);
             shop.FoodPreparationTime = TimeSpan.FromMinutes(prepMinutes);
@@ -54,6 +54,40 @@ namespace coursework.Services
             );
             shop.Menu.Add(product);
         }
+        public void InitializeDefaultMenu(coursework.Core.BaseShop shop, coursework.Models.CuisineType cuisine)
+        {
+            shop.Menu.Clear();
 
+            switch (cuisine)
+            {
+                case CuisineType.Italian:
+                    AddProductToShop(shop, "Піца Маргарита", 180, 60, TimeSpan.FromMinutes(3), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Паста Карбонара", 210, 75, TimeSpan.FromMinutes(4), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Домашнє Лімончелло", 90, 30, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, cuisine);
+                    break;
+
+                case CuisineType.Asian:
+                    AddProductToShop(shop, "Суші Рол Філадельфія", 240, 90, TimeSpan.FromMinutes(5), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Локшина WOK з куркою", 160, 50, TimeSpan.FromMinutes(3), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Чай Матча", 70, 20, TimeSpan.FromMinutes(1.5), ProductCategory.Drink, DietaryType.Standard, cuisine);
+                    break;
+
+                case CuisineType.American:
+                    AddProductToShop(shop, "Дабл Бургер Меню", 195, 65, TimeSpan.FromMinutes(2.5), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Картопля Фрі з соусом", 65, 15, TimeSpan.FromMinutes(2), ProductCategory.Snack, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Холодна Кола", 40, 10, TimeSpan.FromMinutes(0.5), ProductCategory.Drink, DietaryType.Standard, cuisine);
+                    break;
+
+                case CuisineType.Ukrainian:
+                    AddProductToShop(shop, "Борщ з пампушками", 140, 45, TimeSpan.FromMinutes(4), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Вареники з лівером", 110, 35, TimeSpan.FromMinutes(3.5), ProductCategory.MainCourse, DietaryType.Standard, cuisine);
+                    AddProductToShop(shop, "Холодний Узвар", 35, 8, TimeSpan.FromMinutes(0.5), ProductCategory.Drink, DietaryType.Standard, cuisine);
+                    break;
+
+                default: 
+                    AddProductToShop(shop, "Стандартний Сендвіч", 95, 30, TimeSpan.FromMinutes(2), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.Universal);
+                    AddProductToShop(shop, "Кава Американо", 45, 12, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal); break;
+            }
+        }
     }
 }

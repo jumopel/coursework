@@ -55,5 +55,10 @@ namespace coursework.ViewModels
             TargetZoneName = zoneName;
             IsPlacingShop = true;
         }
+        public void ActivateShopPlacementMode(BaseShop newShop)
+        {
+            ShopToPlace = newShop;
+            IsPlacingShop = true;
+        }
     }
 }

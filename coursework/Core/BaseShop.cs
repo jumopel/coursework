@@ -6,12 +6,12 @@ using System.Text;
 
 namespace coursework.Core
 {
-    public abstract class BaseShop : FestivalElement
+    public class BaseShop : FestivalElement
     {
         public enum ShopType { FastFood, Restaurant }
         public ObservableCollection<Product> Menu { get; } = new ObservableCollection<Product>();
 
-        private double _baseAttractiveness = 1.0;
+        private double _baseAttractiveness = 15.0;
         private decimal _revenue;
         private decimal _totalConsumablesCost;
         private decimal _averageCheck;
@@ -41,7 +41,7 @@ namespace coursework.Core
             get => _averageCheck;
             set => SetProperty(ref _averageCheck, value);
         }
-        public decimal DailyRent
+        public decimal BaseRent
         {
             get => _dailyRent;
             set => SetProperty(ref _dailyRent, value);
@@ -61,6 +61,7 @@ namespace coursework.Core
             get => _cooksCount;
             set => SetProperty(ref _cooksCount, value);
         }
+        public Models.CuisineType ShopCuisine { get; set; } = Models.CuisineType.Universal;
         public TimeSpan FoodPreparationTime
         {
             get => _foodPreparationTime;
@@ -88,7 +89,7 @@ namespace coursework.Core
             }
         }
         public double MarginMultiplier { get; set; }
-        public decimal NetProfit => Revenue - TotalConsumablesCost - DailyRent - StaffsDailySalary;
+        public decimal NetProfit => Revenue - TotalConsumablesCost - BaseRent - StaffsDailySalary;
         public int CashierQueue
         {
             get => _cashierQueue;
@@ -116,7 +117,7 @@ namespace coursework.Core
         }
         public TimeSpan BaseServiceTime { get; set; }
         public int CurrentQueue => CashierQueue + KitchenQueue;
-        public double CurrentAttractiveness
+        public double CurrentAttractiveness 
         {
             get
             {
@@ -158,7 +159,7 @@ namespace coursework.Core
             }
         }
         public double AverageServiceSpeedMinutes => TotalCustomersServed > 0 ? _totalWaitTimeMinutes / TotalCustomersServed : 0;
-        protected BaseShop()
+        public BaseShop()
         {
             Revenue = 0;
             TotalConsumablesCost = 0;

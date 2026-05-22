@@ -82,14 +82,14 @@ namespace coursework.ViewModels
             });
             OpenAddShopCommand = new RelayCommand(_ =>
             {
-                var addShopVm = new AddShopViewModel(_engine.Zones);
+                var addShopVm = new AddShopViewModel();
                 var window = new coursework.Views.AddShopWindow(addShopVm);
                 window.Owner = System.Windows.Application.Current.MainWindow;
 
-                addShopVm.ShopCreated += (newShop, zoneName) =>
+                addShopVm.ShopCreated += (newShop) =>
                 {
                     var mapVm = new MapViewModel(_engine);
-                    mapVm.ActivateShopPlacementMode(newShop, zoneName); 
+                    mapVm.ActivateShopPlacementMode(newShop); 
 
                     var mapWindow = new coursework.Views.MapWindow(_engine)
                     {
@@ -210,8 +210,7 @@ namespace coursework.ViewModels
                 orderTakingMinutes: 1.5,
                 prepMinutes: 4.0,
                 x: 150,
-                y: 200,
-                type: ShopType.FastFood
+                y: 200
             );
 
             _dataService.AddProductToShop(burgerShop, "Краш Бургер XXL", 145, 55, TimeSpan.FromMinutes(3), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.American);
@@ -227,8 +226,7 @@ namespace coursework.ViewModels
                 orderTakingMinutes: 2.5,
                 prepMinutes: 8.0,
                 x: 400,
-                y: 200,
-                type: ShopType.Restaurant
+                y: 200
             );
 
             _dataService.AddProductToShop(pizzaShop, "Піца Маргарита", 300, 85, TimeSpan.FromMinutes(6), ProductCategory.MainCourse, DietaryType.Vegetarian, CuisineType.Italian);
@@ -268,5 +266,6 @@ namespace coursework.ViewModels
                 UpdateSnapshot(); 
             }
         }
+       
     }
 }
