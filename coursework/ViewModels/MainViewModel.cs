@@ -85,6 +85,22 @@ namespace coursework.ViewModels
                 var addShopVm = new AddShopViewModel(_engine.Zones);
                 var window = new coursework.Views.AddShopWindow(addShopVm);
                 window.Owner = System.Windows.Application.Current.MainWindow;
+
+                addShopVm.ShopCreated += (newShop, zoneName) =>
+                {
+                    var mapVm = new MapViewModel(_engine);
+                    mapVm.ActivateShopPlacementMode(newShop, zoneName); 
+
+                    var mapWindow = new coursework.Views.MapWindow(_engine)
+                    {
+                        DataContext = mapVm,
+                        Owner = System.Windows.Application.Current.MainWindow
+                    };
+
+                    mapWindow.ShowDialog();
+                    UpdateSnapshot(); 
+                };
+
                 window.ShowDialog();
             });
             OpenAddZoneCommand = new RelayCommand(_ =>
@@ -92,8 +108,22 @@ namespace coursework.ViewModels
                 var addZoneVm = new AddZoneViewModel(_engine);
                 var window = new coursework.Views.AddZoneWindow(addZoneVm);
                 window.Owner = System.Windows.Application.Current.MainWindow;
-                window.ShowDialog();
-                UpdateSnapshot();
+
+                addZoneVm.ZoneCreated += (newZone) =>
+                {
+                    var mapVm = new MapViewModel(_engine);
+                    mapVm.ActivatePlacementMode(newZone);
+
+                    var mapWindow = new coursework.Views.MapWindow(_engine);
+                    mapWindow.DataContext = mapVm; 
+                    mapWindow.Owner = System.Windows.Application.Current.MainWindow;
+
+                    mapWindow.ShowDialog(); 
+
+                    UpdateSnapshot();
+                };
+
+                window.ShowDialog(); 
             });
 
             DeleteZoneCommand = new RelayCommand(param => DeleteZone(param as coursework.DTO.ZoneStateDto));
@@ -159,12 +189,17 @@ namespace coursework.ViewModels
 
         private void InitializeDemoData()
         {
-            var foodZone = _dataService.CreateZoneFromUser(
-                name: "Центральний Фуд-Корт",
-                theme: "Американська та Італійська кухня",
-                capacity: 120,
-                cuisine: CuisineType.Universal
-            );
+            var foodZone = new BaseZone
+            {
+                Name = "Центральний Фуд-Корт",
+                Theme = "Американська та Італійська кухня",
+                Capacity = 120,
+                Width = 400,
+                Height = 250,
+                X = 30,
+                Y = 30,
+                ZoneCuisine = Models.CuisineType.Universal
+            };
 
             var burgerShop = _dataService.CreateShop(
                 name: "Бургерна 'Краш'",

@@ -6,34 +6,66 @@
         ResizeMode="CanMinimize"
         Background="#1a1a2e">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Heatmap bitmap -->
-        <Border Grid.Row="0"
-                Margin="10"
-                BorderBrush="#444"
-                BorderThickness="1"
-                CornerRadius="4"
-                ClipToBounds="True">
-            <Image Source="{Binding HeatmapImage}"
-                   Stretch="Uniform"
-                   RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-        </Border>
+        <Grid Grid.Row="0" Margin="10" ClipToBounds="True">
 
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,10">
+            <Image Source="{Binding HeatmapImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
 
-            <TextBlock Text="Мало"
-                       Foreground="#aaa"
-                       VerticalAlignment="Center"
-                       Margin="0,0,6,0"/>
+            <ItemsControl ItemsSource="{Binding Zones}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="{Binding Width}" Height="{Binding Height}" 
+                                BorderBrush="#8E44AD" BorderThickness="2" 
+                                Background="#208E44AD" CornerRadius="6">
+                            <TextBlock Text="{Binding Name}" Foreground="#FFFFFF" FontWeight="Bold" Margin="5" Opacity="0.8">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="2" ShadowDepth="1"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
+            <Canvas Background="Transparent" MouseMove="Canvas_MouseMove" MouseLeftButtonDown="Canvas_MouseLeftButtonDown">
+                <Border x:Name="PlacementPreview" 
+                        Width="{Binding ZoneToPlace.Width}" 
+                        Height="{Binding ZoneToPlace.Height}" 
+                        Background="#808E44AD" BorderBrush="#8E44AD" BorderThickness="2"
+                        Visibility="{Binding IsPlacingZone, Converter={StaticResource BoolToVis}}"/>
+                <Ellipse x:Name="ShopPlacementPreview" 
+         Width="20" Height="20" 
+         Fill="#CCFFFFFF" Stroke="#E74C3C" StrokeThickness="3"
+         Visibility="{Binding IsPlacingShop, Converter={StaticResource BoolToVis}}">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+            </Canvas>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+            <TextBlock Text="Мало" Foreground="#aaa" VerticalAlignment="Center" Margin="0,0,6,0"/>
             <Border Width="200" Height="16" CornerRadius="3">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -44,21 +76,9 @@
                     </LinearGradientBrush>
                 </Border.Background>
             </Border>
-
-            <TextBlock Text="Багато"
-                       Foreground="#aaa"
-                       VerticalAlignment="Center"
-                       Margin="6,0,20,0"/>
-
-            <Ellipse Width="14" Height="14"
-                     Fill="White"
-                     Stroke="#222"
-                     StrokeThickness="2"
-                     VerticalAlignment="Center"
-                     Margin="0,0,6,0"/>
-            <TextBlock Text="Магазин"
-                       Foreground="#aaa"
-                       VerticalAlignment="Center"/>
+            <TextBlock Text="Багато" Foreground="#aaa" VerticalAlignment="Center" Margin="6,0,20,0"/>
+            <Ellipse Width="14" Height="14" Fill="White" Stroke="#222" StrokeThickness="2" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBlock Text="Магазин" Foreground="#aaa" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Window>

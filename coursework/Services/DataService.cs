@@ -3,6 +3,7 @@ using coursework.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Policy;
 using System.Text.Json;
 using static coursework.Core.BaseShop;
 
@@ -12,7 +13,7 @@ namespace coursework.Services
     {
         public BaseZone CreateZoneFromUser(string name, string theme, int capacity, CuisineType cuisine)
         {
-            var zone = new FoodZone
+            var zone = new BaseZone
             {
                 Name = name,
                 Theme = theme,

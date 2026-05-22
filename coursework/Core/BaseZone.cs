@@ -8,7 +8,7 @@ using System.Text;
 
 namespace coursework.Core
 {
-    public abstract class BaseZone : FestivalElement
+    public  class BaseZone : FestivalElement
     {
         private double _attractiveness;
         private string _theme = string.Empty;
@@ -73,7 +73,7 @@ namespace coursework.Core
             get => _zoneCuisine;
             set => SetProperty(ref _zoneCuisine, value);
         }
-        protected BaseZone()
+        public BaseZone()
         {
             Shops = new ObservableCollection<BaseShop>();
 

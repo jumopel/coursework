@@ -24,7 +24,7 @@ namespace coursework.ViewModels
         private double _x = 300;
         private double _y = 300;
         private BaseZone? _selectedZone;
-
+        public event Action<coursework.Core.BaseShop, string>? ShopCreated;
         public string ShopName { get => _shopName; set => SetProperty(ref _shopName, value); }
         public ShopType SelectedType { get => _selectedType; set => SetProperty(ref _selectedType, value); }
         public List<ShopType> ShopTypes { get; } = Enum.GetValues(typeof(ShopType)).Cast<ShopType>().ToList();
@@ -80,8 +80,10 @@ namespace coursework.ViewModels
                 dataService.AddProductToShop(newShop, "Келих вина", 95, 35, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
             }
 
-            SelectedZone.AddShop(newShop);
-
+            if (SelectedZone != null)
+            {
+                ShopCreated?.Invoke(newShop, SelectedZone.Name);
+            }
             RequestClose?.Invoke();
         }
     }
