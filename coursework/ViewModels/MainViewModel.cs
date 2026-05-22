@@ -24,6 +24,7 @@ namespace coursework.ViewModels
 
         public ObservableCollection<ZoneStateDto> Zones { get; } = new ObservableCollection<ZoneStateDto>();
         public ICommand OpenMapCommand { get; }
+        public ICommand OpenAddShopCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -63,6 +64,13 @@ namespace coursework.ViewModels
             {
                 var mapWindow = new coursework.Views.MapWindow(_engine);
                 mapWindow.Show();
+            });
+            OpenAddShopCommand = new RelayCommand(_ =>
+            {
+                var addShopVm = new AddShopViewModel(_engine.Zones);
+                var window = new coursework.Views.AddShopWindow(addShopVm);
+                window.Owner = System.Windows.Application.Current.MainWindow;
+                window.ShowDialog();
             });
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
             InitializeDemoData();
