@@ -45,12 +45,14 @@ namespace coursework.Services
                 {
                     zoneDto.ShopsData.Add(new ShopStateDto
                     {
-                        ShopId = shop.Id,                        
-                        ShopName = shop.Name,                   
-                        CurrentRevenue = shop.Revenue,          
-                        CurrentQueue = shop.CurrentQueue,        
-                        CongestionLevel = Math.Round(shop.CongestionLevel, 2),       
-                        Attractiveness = Math.Round(shop.CurrentAttractiveness, 2)   
+                        ShopId = shop.Id,
+                        ShopName = shop.Name,
+                        CurrentRevenue = shop.Revenue,
+                        CurrentQueue = shop.CurrentQueue,
+                        CongestionLevel = Math.Round(shop.CongestionLevel, 2),
+                        Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
+                        CashiersCount = shop.CashiersCount,
+                        CooksCount = shop.CooksCount,
                     });
                 }
 
@@ -73,7 +75,10 @@ namespace coursework.Services
                         CurrentRevenue = shop.Revenue,           
                         CurrentQueue = shop.CurrentQueue,        
                         CongestionLevel = Math.Round(shop.CongestionLevel, 2),       
-                        Attractiveness = Math.Round(shop.CurrentAttractiveness, 2)      
+                        Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
+                        CashiersCount = shop.CashiersCount,
+                        CooksCount = shop.CooksCount,
+
                     });
                 }
             }

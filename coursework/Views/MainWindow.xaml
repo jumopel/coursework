@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:coursework.ViewModels"
         mc:Ignorable="d"
-        Title="GastroMetric - Симуляція Фестивалю" Height="720" Width="1150"
+        Title="GastroMetric - Симуляція Фестивалю" Height="720" Width="1250"
         WindowStartupLocation="CenterScreen"
         Background="#F4F6F9">
 
@@ -31,19 +31,39 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="▶ Старт" Command="{Binding StartCommand}" 
+                            Width="90" Height="35" Margin="0,0,10,0" 
+                            Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+
+                    <Button Content="⏸ Пауза" Command="{Binding PauseCommand}" 
+                            Width="90" Height="35" 
+                            Background="#F44336" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Text="Ігровий час:" FontSize="16" Foreground="#555" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding ElapsedTimeText}" FontSize="22" FontWeight="Bold" Foreground="#2C3E50"/>
+                </StackPanel>
+
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Швидкість:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#555"/>
                     <Button Content="1x" Command="{Binding SetSpeed1XCommand}" Width="40" Height="30" Margin="0,0,5,0" Background="#E0E0E0" BorderThickness="0"/>
                     <Button Content="2x" Command="{Binding SetSpeed2XCommand}" Width="40" Height="30" Margin="0,0,5,0" Background="#E0E0E0" BorderThickness="0"/>
                     <Button Content="4x" Command="{Binding SetSpeed4XCommand}" Width="40" Height="30" Background="#E0E0E0" BorderThickness="0"/>
+                    <Button Content="➕ Додати зону" Command="{Binding OpenAddZoneCommand}"  Width="120" Height="35" Margin="15,0,0,0" Background="#8E44AD" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                        <Button.Effect>
+                            <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="4" ShadowDepth="1"/>
+                        </Button.Effect>
+                    </Button>
 
                     <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" 
-            Width="140" Height="35" Margin="15,0,0,0" 
-            Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                            Width="140" Height="35" Margin="15,0,0,0" 
+                            Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="Button_Click"/>
 
                     <Button Content="➕ Додати заклад" Command="{Binding OpenAddShopCommand}" 
-            Width="140" Height="35" Margin="10,0,0,0" 
-            Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                            Width="140" Height="35" Margin="10,0,0,0" 
+                            Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0">
                         <Button.Effect>
                             <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="4" ShadowDepth="1"/>
                         </Button.Effect>
@@ -55,7 +75,7 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Zones}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" RowDetailsVisibilityMode="VisibleWhenSelected"
                   Background="White" BorderBrush="#E0E0E0" BorderThickness="1" HeadersVisibility="Column"
-                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EEEEEE" SelectionChanged="DataGrid_SelectionChanged_1">
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EEEEEE">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Назва Зони" Binding="{Binding ZoneName}" Width="2*"/>
@@ -63,6 +83,19 @@
                 <DataGridTextColumn Header="Людей" Binding="{Binding CurrentVisitors}" Width="Auto"/>
                 <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
                 <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
+                <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
+                <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
+
+                <DataGridTemplateColumn Header="Керування" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="🗑 Видалити" 
+                        Command="{Binding DataContext.DeleteZoneCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                        CommandParameter="{Binding}" 
+                        Padding="15,2" Margin="5,0" Background="#E74C3C" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
 
             <DataGrid.RowDetailsTemplate>
@@ -80,6 +113,27 @@
                                     <DataGridTextColumn Header="Завантаженість (хв)" Binding="{Binding CongestionLevel}" Width="Auto"/>
                                     <DataGridTextColumn Header="Привабливість" Binding="{Binding Attractiveness}" Width="Auto"/>
                                     <DataGridTextColumn Header="Каса (грн)" Binding="{Binding CurrentRevenue}" Width="Auto"/>
+
+                                    <DataGridTextColumn Header="Касири" Binding="{Binding CashiersCount}" Width="Auto"/>
+                                    <DataGridTextColumn Header="Кухарі" Binding="{Binding CooksCount}" Width="Auto"/>
+
+                                    <DataGridTemplateColumn Header="Керування персоналом" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                    <Button Content="+ Касир (500₴)" 
+                                                            Command="{Binding DataContext.HireCashierCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                            CommandParameter="{Binding}" 
+                                                            Margin="0,0,5,0" Padding="8,2" Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+
+                                                    <Button Content="+ Кухар (700₴)" 
+                                                            Command="{Binding DataContext.HireCookCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                            CommandParameter="{Binding}" 
+                                                            Padding="8,2" Background="#E67E22" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>

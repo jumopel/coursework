@@ -14,6 +14,7 @@ namespace coursework.ViewModels
     {
         private string _shopName = "Новий заклад";
         private ShopType _selectedType = ShopType.FastFood;
+        private CuisineType _selectedCuisine = CuisineType.Universal;
         private int _cashiersCount = 2;
         private int _cooksCount = 2;
         private decimal _dailyRent = 500;
@@ -36,6 +37,13 @@ namespace coursework.ViewModels
         public double PrepMinutes { get => _prepMinutes; set => SetProperty(ref _prepMinutes, value); }
         public double X { get => _x; set => SetProperty(ref _x, value); }
         public double Y { get => _y; set => SetProperty(ref _y, value); }
+        public CuisineType SelectedCuisine
+        {
+            get => _selectedCuisine;
+            set => SetProperty(ref _selectedCuisine, value);
+        }
+
+        public List<CuisineType> Cuisines { get; } = Enum.GetValues(typeof(CuisineType)).Cast<CuisineType>().ToList();
 
         public BaseZone? SelectedZone { get => _selectedZone; set => SetProperty(ref _selectedZone, value); }
         public List<BaseZone> AvailableZones { get; }
@@ -63,12 +71,12 @@ namespace coursework.ViewModels
 
             if (SelectedType == ShopType.FastFood)
             {
-                dataService.AddProductToShop(newShop, "Комбо Бургер", 150, 50, TimeSpan.FromMinutes(PrepMinutes), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.American);
+                dataService.AddProductToShop(newShop, $"Комбо меню ({SelectedCuisine})", 150, 50, TimeSpan.FromMinutes(PrepMinutes), ProductCategory.MainCourse, DietaryType.Standard, SelectedCuisine);
                 dataService.AddProductToShop(newShop, "Фірмовий Напій", 45, 12, TimeSpan.FromMinutes(0.5), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
             }
             else
             {
-                dataService.AddProductToShop(newShop, "Фірмова Паста", 240, 80, TimeSpan.FromMinutes(PrepMinutes), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.Italian);
+                dataService.AddProductToShop(newShop, $"Спешл страва ({SelectedCuisine})", 240, 80, TimeSpan.FromMinutes(PrepMinutes), ProductCategory.MainCourse, DietaryType.Standard, SelectedCuisine);
                 dataService.AddProductToShop(newShop, "Келих вина", 95, 35, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
             }
 

@@ -1,16 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using coursework.Core;
+using System;
 
 namespace coursework.DTO
 {
-    public class ShopStateDto
+    public class ShopStateDto : ObservableObject
     {
+        private int _currentQueue;
+        private double _congestionLevel;
+        private double _attractiveness;
+        private decimal _currentRevenue;
+        private int _cashiersCount;
+        private int _cooksCount;
+
+        public string ShopName { get; set; } = string.Empty;
         public Guid ShopId { get; set; }
-        public string ShopName { get; set; }
-        public decimal CurrentRevenue { get; set; }
-        public int CurrentQueue { get; set; }
-        public double CongestionLevel { get; set; } 
-        public double Attractiveness { get; set; }
+        public int CurrentQueue { get => _currentQueue; set => SetProperty(ref _currentQueue, value); }
+        public double CongestionLevel { get => _congestionLevel; set => SetProperty(ref _congestionLevel, value); }
+        public double Attractiveness { get => _attractiveness; set => SetProperty(ref _attractiveness, value); }
+        public decimal CurrentRevenue { get => _currentRevenue; set => SetProperty(ref _currentRevenue, value); }
+        public int CashiersCount { get => _cashiersCount; set => SetProperty(ref _cashiersCount, value); }
+        public int CooksCount { get => _cooksCount; set => SetProperty(ref _cooksCount, value); }
     }
 }

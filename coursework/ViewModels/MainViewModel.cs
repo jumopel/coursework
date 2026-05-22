@@ -25,6 +25,10 @@ namespace coursework.ViewModels
         public ObservableCollection<ZoneStateDto> Zones { get; } = new ObservableCollection<ZoneStateDto>();
         public ICommand OpenMapCommand { get; }
         public ICommand OpenAddShopCommand { get; }
+        public ICommand HireCashierCommand { get; }
+        public ICommand HireCookCommand { get; }
+        public ICommand OpenAddZoneCommand { get; }
+        public ICommand DeleteZoneCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -55,11 +59,22 @@ namespace coursework.ViewModels
             _engine = new SimulationEngine();
             _dataProvider = new SimulationDataProvider(_engine);
             _dataService = new DataService();
-            StartCommand = new RelayCommand(_ => _dataProvider.SendCommand("START"), _ => !IsSimulationRunning);
-            PauseCommand = new RelayCommand(_ => _dataProvider.SendCommand("PAUSE"), _ => IsSimulationRunning);
+            StartCommand = new RelayCommand(_ =>
+            {
+                _dataProvider.SendCommand("START");
+                UpdateSnapshot(); 
+            }, _ => !IsSimulationRunning);
+
+            PauseCommand = new RelayCommand(_ =>
+            {
+                _dataProvider.SendCommand("PAUSE");
+                UpdateSnapshot(); 
+            }, _ => IsSimulationRunning);
             SetSpeed1XCommand = new RelayCommand(_ => ChangeSpeed(1.0));
             SetSpeed2XCommand = new RelayCommand(_ => ChangeSpeed(2.0));
             SetSpeed4XCommand = new RelayCommand(_ => ChangeSpeed(4.0));
+            HireCashierCommand = new RelayCommand(param => HireStaff(param as coursework.DTO.ShopStateDto, true));
+            HireCookCommand = new RelayCommand(param => HireStaff(param as coursework.DTO.ShopStateDto, false));
             OpenMapCommand = new RelayCommand(_ =>
             {
                 var mapWindow = new coursework.Views.MapWindow(_engine);
@@ -72,6 +87,16 @@ namespace coursework.ViewModels
                 window.Owner = System.Windows.Application.Current.MainWindow;
                 window.ShowDialog();
             });
+            OpenAddZoneCommand = new RelayCommand(_ =>
+            {
+                var addZoneVm = new AddZoneViewModel(_engine);
+                var window = new coursework.Views.AddZoneWindow(addZoneVm);
+                window.Owner = System.Windows.Application.Current.MainWindow;
+                window.ShowDialog();
+                UpdateSnapshot();
+            });
+
+            DeleteZoneCommand = new RelayCommand(param => DeleteZone(param as coursework.DTO.ZoneStateDto));
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
             InitializeDemoData();
             UpdateSnapshot();
@@ -92,13 +117,45 @@ namespace coursework.ViewModels
         {
             IsSimulationRunning = _engine.IsRunning;
             ElapsedTimeText = $"{(int)_engine.ElapsedGameTime.TotalHours:00}:{_engine.ElapsedGameTime.Minutes:00}";
+
             var freshZonesSnapshot = _dataProvider.GetZonesSnapshot().ToList();
-            Zones.Clear();
-            foreach (var zoneDto in freshZonesSnapshot)
+
+            if (Zones.Count == 0 || Zones.Count != freshZonesSnapshot.Count ||
+                Zones.Any(z => z.ShopsData.Count != freshZonesSnapshot.First(f => f.ZoneName == z.ZoneName).ShopsData.Count))
             {
-                Zones.Add(zoneDto);
+                Zones.Clear();
+                foreach (var zoneDto in freshZonesSnapshot) Zones.Add(zoneDto);
+                return;
+            }
+
+            for (int i = 0; i < Zones.Count; i++)
+            {
+                var currentZone = Zones[i];
+                var freshZone = freshZonesSnapshot.FirstOrDefault(z => z.ZoneName == currentZone.ZoneName);
+                if (freshZone != null)
+                {
+                    currentZone.CurrentVisitors = freshZone.CurrentVisitors;
+                    currentZone.OccupancyRate = freshZone.OccupancyRate;
+                    currentZone.TotalRevenue = freshZone.TotalRevenue;
+
+                    for (int j = 0; j < currentZone.ShopsData.Count; j++)
+                    {
+                        var currentShop = currentZone.ShopsData[j];
+                        var freshShop = freshZone.ShopsData.FirstOrDefault(s => s.ShopName == currentShop.ShopName);
+                        if (freshShop != null)
+                        {
+                            currentShop.CurrentQueue = freshShop.CurrentQueue;
+                            currentShop.CongestionLevel = freshShop.CongestionLevel;
+                            currentShop.Attractiveness = freshShop.Attractiveness;
+                            currentShop.CurrentRevenue = freshShop.CurrentRevenue;
+                            currentShop.CashiersCount = freshShop.CashiersCount;
+                            currentShop.CooksCount = freshShop.CooksCount;
+                        }
+                    }
+                }
             }
         }
+        
 
         private void InitializeDemoData()
         {
@@ -145,6 +202,36 @@ namespace coursework.ViewModels
             foodZone.AddShop(burgerShop);
             foodZone.AddShop(pizzaShop);
             _engine.Zones.Add(foodZone);
+        }
+        private void HireStaff(coursework.DTO.ShopStateDto? dto, bool isCashier)
+        {
+            if (dto == null) return;
+            var shop = _engine.Zones.SelectMany(z => z.Shops).FirstOrDefault(s => s.Name == dto.ShopName);
+            if (shop != null)
+            {
+                if (isCashier)
+                {
+                    shop.CashiersCount++;
+                    shop.StaffsDailySalary += 500; 
+                }
+                else
+                {
+                    shop.CooksCount++;
+                    shop.StaffsDailySalary += 700; 
+                }
+                UpdateSnapshot();
+            }
+        }
+        private void DeleteZone(coursework.DTO.ZoneStateDto? dto)
+        {
+            if (dto == null) return;
+
+            var zoneToRemove = _engine.Zones.FirstOrDefault(z => z.Name == dto.ZoneName);
+            if (zoneToRemove != null)
+            {
+                _engine.Zones.Remove(zoneToRemove);
+                UpdateSnapshot(); 
+            }
         }
     }
 }

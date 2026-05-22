@@ -17,7 +17,8 @@
 
                 <TextBlock Text="Тип закладу:" FontWeight="Bold" Foreground="#2C3E50"/>
                 <ComboBox ItemsSource="{Binding ShopTypes}" SelectedItem="{Binding SelectedType}" Padding="6" Margin="0,0,0,5"/>
-
+                <TextBlock Text="Тематика закладу (Кухня):" FontWeight="Bold" Foreground="#2C3E50"/>
+                <ComboBox ItemsSource="{Binding Cuisines}" SelectedItem="{Binding SelectedCuisine}" Padding="6" Margin="0,0,0,10"/>
                 <TextBlock Text="Виберіть зону розміщення:" FontWeight="Bold" Foreground="#2C3E50"/>
                 <ComboBox ItemsSource="{Binding AvailableZones}" SelectedItem="{Binding SelectedZone}" DisplayMemberPath="Name" Padding="6" Margin="0,0,0,10"/>
 

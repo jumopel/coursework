@@ -13,6 +13,8 @@ namespace coursework.Core
         private double _attractiveness;
         private string _theme = string.Empty;
         private int _capacity;
+        private double _width;
+        private double _height;
         private int _currentVisitors;
         public double Attractiveness
         {
@@ -34,6 +36,17 @@ namespace coursework.Core
                     OnPropertyChanged(nameof(OccupancyRate)); 
                 }
             }
+        }
+        public double Width
+        {
+            get => _width;
+            set => SetProperty(ref _width, value);
+        }
+
+        public double Height
+        {
+            get => _height;
+            set => SetProperty(ref _height, value);
         }
 
         public ObservableCollection<BaseShop> Shops { get; private set; }
