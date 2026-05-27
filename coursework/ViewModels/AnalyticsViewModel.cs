@@ -17,11 +17,18 @@ namespace coursework.ViewModels
 
         public decimal TotalRevenue { get; set; }
         public int TotalVisitors { get; set; }
-
+        public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
+        private readonly coursework.Services.ExportService _exportService;
         public AnalyticsViewModel(IFestivalDataProvider dataProvider)
         {
             _dataProvider = dataProvider;
-            GenerateCharts();
+            _exportService = new coursework.Services.ExportService();
+            ExportOverallReportCommand = new coursework.Commands.RelayCommand(_ =>
+            {
+                var snapshot = _dataProvider.GetZonesSnapshot();
+                _exportService.GenerateOverallReport(snapshot);
+            });
+            GenerateCharts();   
         }
 
         public void GenerateCharts()

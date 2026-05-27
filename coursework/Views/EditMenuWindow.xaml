@@ -1,7 +1,7 @@
 <Window x:Class="coursework.Views.EditMenuWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Керування меню закладу" Height="520" Width="750"
+        Title="Керування меню закладу" Height="520" Width="780"
         WindowStartupLocation="CenterOwner" Background="#F8F9FA">
     <Grid Margin="15">
         <Grid.RowDefinitions>
@@ -21,7 +21,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="110"/>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,10">
@@ -32,7 +32,7 @@
                     <TextBlock Text="Ціна (грн):" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,5"/>
                     <TextBox Text="{Binding NewPrice, UpdateSourceTrigger=PropertyChanged}" Padding="6"/>
                 </StackPanel>
-                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
+                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10" Width="100" HorizontalAlignment="Right">
                     <TextBlock Text="Час (хв):" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,5"/>
                     <TextBox Text="{Binding NewPrepTime, UpdateSourceTrigger=PropertyChanged}" Padding="6"/>
                 </StackPanel>
@@ -46,29 +46,53 @@
                     <ComboBox ItemsSource="{Binding DietaryTags}" SelectedItem="{Binding SelectedDietaryTag}" Padding="6"/>
                 </StackPanel>
 
-                <Button Grid.Row="1" Grid.Column="2" Content="➕ Додати" Command="{Binding AddProductCommand}" 
-                        Height="32" Margin="0,21,0,0" VerticalAlignment="Top"
-                        Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,1">
+                    <Button Content="✖ Скасувати" Command="{Binding CancelEditCommand}" 
+                            Height="32" Margin="0,0,5,0" Padding="10,0"
+                            Background="#95A5A6" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="{Binding SubmitButtonText}" Command="{Binding SubmitProductCommand}" 
+                            Height="32" Width="100"
+                            Background="{Binding SubmitButtonColor}" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                </StackPanel>
             </Grid>
         </Border>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding MenuItems}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" Background="White" HeadersVisibility="Column"
-                  RowHeight="35" AlternatingRowBackground="#F2F4F4">
+                  RowHeight="38" AlternatingRowBackground="#F2F4F4">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Назва Страви" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Ціна" Binding="{Binding Price}" Width="70"/>
-                <DataGridTextColumn Header="Приготування" Binding="{Binding PreparationTime.TotalMinutes}" Width="100"/>
+                <DataGridTextColumn Header="Час (хв)" Binding="{Binding PreparationTime.TotalMinutes}" Width="70"/>
                 <DataGridTextColumn Header="Категорія" Binding="{Binding Category}" Width="100"/>
                 <DataGridTextColumn Header="Тег" Binding="{Binding DietaryTag}" Width="100"/>
 
-                <DataGridTemplateColumn Width="95">
+                <DataGridTemplateColumn Width="190">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="❌ Видалити" 
-                                    Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    CommandParameter="{Binding}"
-                                    Background="#E74C3C" Foreground="White" BorderThickness="0" Margin="5,3"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="✏ Редаг." 
+                                        Command="{Binding DataContext.StartEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="{Binding}"
+                                        Background="#F39C12" Foreground="White" BorderThickness="0" Margin="2,0,5,0" Padding="8,5"/>
+
+                                <Button Content="❌ Видалити" 
+                                        Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="{Binding}"
+                                        Background="#E74C3C" Foreground="White" BorderThickness="0" Margin="0" Padding="8,5"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

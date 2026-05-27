@@ -147,6 +147,7 @@ namespace coursework.Core
                 if (SetProperty(ref _totalCustomersServed, value)) OnPropertyChanged(nameof(AverageServiceSpeedMinutes));
             }
         }
+        public int TotalOrders { get; set; } = 0; 
         public double TotalWaitTimeMinutes
         {
             get => _totalWaitTimeMinutes;

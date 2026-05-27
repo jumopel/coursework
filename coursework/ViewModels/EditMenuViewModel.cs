@@ -12,7 +12,6 @@ namespace coursework.ViewModels
     public class EditMenuViewModel : ObservableObject
     {
         private readonly BaseShop _shop;
-
         public ObservableCollection<Product> MenuItems => _shop.Menu;
 
         private string _newName = "Нова страва";
@@ -30,35 +29,98 @@ namespace coursework.ViewModels
         public List<ProductCategory> Categories { get; } = Enum.GetValues(typeof(ProductCategory)).Cast<ProductCategory>().ToList();
         public List<DietaryType> DietaryTags { get; } = Enum.GetValues(typeof(DietaryType)).Cast<DietaryType>().ToList();
 
-        public ICommand AddProductCommand { get; }
+        private bool _isEditing = false;
+        private Product? _editingProduct;
+
+        public bool IsEditing { get => _isEditing; set => SetProperty(ref _isEditing, value); }
+
+        private string _submitButtonText = "Додати";
+        public string SubmitButtonText { get => _submitButtonText; set => SetProperty(ref _submitButtonText, value); }
+
+        private string _submitButtonColor = "#27AE60"; 
+        public string SubmitButtonColor { get => _submitButtonColor; set => SetProperty(ref _submitButtonColor, value); }
+
+        public ICommand SubmitProductCommand { get; }
         public ICommand RemoveProductCommand { get; }
+        public ICommand StartEditCommand { get; }
+        public ICommand CancelEditCommand { get; }
 
         public EditMenuViewModel(BaseShop shop)
         {
             _shop = shop;
 
-            AddProductCommand = new RelayCommand(_ => AddProduct(), _ =>
+            SubmitProductCommand = new RelayCommand(_ => SubmitProduct(), _ =>
                 !string.IsNullOrWhiteSpace(NewName) && NewPrice > 0 && NewPrepTime > 0);
 
             RemoveProductCommand = new RelayCommand(param => RemoveProduct(param as Product));
+            StartEditCommand = new RelayCommand(param => StartEdit(param as Product));
+            CancelEditCommand = new RelayCommand(_ => CancelEdit());
         }
 
-        private void AddProduct()
+        private void SubmitProduct()
         {
-            var product = new Product
+            if (IsEditing && _editingProduct != null)
             {
-                Name = NewName,
-                Price = NewPrice,
-                CostPrice = NewPrice * 0.4m,
-                PreparationTime = TimeSpan.FromMinutes(NewPrepTime),
-                Cuisine = _shop.ShopCuisine,
-                Category = SelectedCategory,
-                DietaryTag = SelectedDietaryTag
-            };
+                _editingProduct.Name = NewName;
+                _editingProduct.Price = NewPrice;
+                _editingProduct.CostPrice = NewPrice * 0.4m;
+                _editingProduct.PreparationTime = TimeSpan.FromMinutes(NewPrepTime);
+                _editingProduct.Category = SelectedCategory;
+                _editingProduct.DietaryTag = SelectedDietaryTag;
 
-            MenuItems.Add(product); 
+                int index = MenuItems.IndexOf(_editingProduct);
+                if (index >= 0)
+                {
+                    MenuItems[index] = _editingProduct;
+                }
 
-            NewName = "Ще одна страва"; 
+                CancelEdit(); 
+            }
+            else
+            {
+                var product = new Product
+                {
+                    Name = NewName,
+                    Price = NewPrice,
+                    CostPrice = NewPrice * 0.4m,
+                    PreparationTime = TimeSpan.FromMinutes(NewPrepTime),
+                    Cuisine = _shop.ShopCuisine,
+                    Category = SelectedCategory,
+                    DietaryTag = SelectedDietaryTag
+                };
+                MenuItems.Add(product);
+                NewName = "Ще одна страва";
+            }
+        }
+
+        private void StartEdit(Product? p)
+        {
+            if (p == null) return;
+
+            _editingProduct = p;
+
+            NewName = p.Name;
+            NewPrice = p.Price;
+            NewPrepTime = p.PreparationTime.TotalMinutes;
+            SelectedCategory = p.Category;
+            SelectedDietaryTag = p.DietaryTag;
+
+            IsEditing = true;
+            SubmitButtonText = "Зберегти";
+            SubmitButtonColor = "#F39C12";
+        }
+
+        private void CancelEdit()
+        {
+            _editingProduct = null;
+            IsEditing = false;
+
+            SubmitButtonText = " Додати";
+            SubmitButtonColor = "#27AE60";
+
+            NewName = "Нова страва";
+            NewPrice = 100;
+            NewPrepTime = 3;
         }
 
         private void RemoveProduct(Product? p)
@@ -66,6 +128,8 @@ namespace coursework.ViewModels
             if (p != null && MenuItems.Contains(p))
             {
                 MenuItems.Remove(p);
+
+                if (p == _editingProduct) CancelEdit();
             }
         }
     }

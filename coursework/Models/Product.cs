@@ -39,7 +39,7 @@ namespace coursework.Models
         private CuisineType _cuisine;
         private decimal _costPrice;
         public Guid Id { get; } = Guid.NewGuid();
-
+        public int SalesCount { get; set; } = 0; 
         public string Name
         {
             get => _name;

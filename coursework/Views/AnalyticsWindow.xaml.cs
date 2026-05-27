@@ -8,5 +8,10 @@ namespace coursework.Views
         {
             InitializeComponent();
         }
+
+        private void PieChart_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

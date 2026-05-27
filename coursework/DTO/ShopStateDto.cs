@@ -20,5 +20,12 @@ namespace coursework.DTO
         public decimal CurrentRevenue { get => _currentRevenue; set => SetProperty(ref _currentRevenue, value); }
         public int CashiersCount { get => _cashiersCount; set => SetProperty(ref _cashiersCount, value); }
         public int CooksCount { get => _cooksCount; set => SetProperty(ref _cooksCount, value); }
+        public decimal TotalExpenses { get; set; }
+        public decimal NetProfit { get; set; }
+        public int TotalOrders { get; set; }
+        public decimal AverageTicket { get; set; }
+        public double AverageWaitTimeMinutes { get; set; }
+        public string TopDishName { get; set; }
+        public string WorstDishName { get; set; }
     }
 }

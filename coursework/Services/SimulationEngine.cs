@@ -224,6 +224,12 @@ namespace coursework.Services
                                 state.PendingOrderTimes.Enqueue(totalPrepTime);
                                 shop.RegisterSale(orderTotal, orderCost);
                                 shop.JoinKitchenQueue();
+                                shop.TotalOrders++; 
+
+                                foreach (var product in order)
+                                {
+                                    product.SalesCount++; 
+                                }
 
                                 visitor.State = Visitor.VisitorState.Eating;
                             }
