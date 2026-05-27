@@ -42,6 +42,29 @@ namespace coursework.Services
                         BorderColor = "#F1C40F"
                     });
                 }
+                if (shop.CurrentRevenue == 0)
+                {
+                    alerts.Add(new AlertMessage
+                    {
+                        Title = "Нульові продажі",
+                        Message = $"Заклад '{shop.ShopName}' досі нічого не продав. Перевірте розташування або привабливість меню.",
+                        Icon = "⚠️",
+                        BackgroundColor = "#FEF9E7",
+                        BorderColor = "#F1C40F"
+                    });
+                }
+                var lossMakers = shop.MenuStats.Where(m => m.Price <= m.CostPrice).ToList();
+                foreach (var item in lossMakers)
+                {
+                    alerts.Add(new AlertMessage
+                    {
+                        Title = "Критична ціна",
+                        Message = $"У '{shop.ShopName}' страва '{item.ProductName}' продається у збиток (Собівартість: {item.CostPrice} ₴, Ціна: {item.Price} ₴).",
+                        Icon = "❌",
+                        BackgroundColor = "#FDEDEC",
+                        BorderColor = "#E74C3C"
+                    });
+                }
             }
 
             var topShop = allShops.OrderByDescending(s => s.NetProfit).FirstOrDefault();
