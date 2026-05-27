@@ -7,26 +7,26 @@ namespace coursework.Models
 {
     public enum ProductCategory
     {
-        MainCourse, 
-        Snack,      
-        Drink,     
-        Dessert     
+        MainCourse,
+        Snack,
+        Drink,
+        Dessert
     }
 
     public enum DietaryType
     {
-        Standard,   
-        Vegetarian, 
-        Vegan       
+        Standard,
+        Vegetarian,
+        Vegan
     }
 
     public enum CuisineType
     {
-        Universal,  
+        Universal,
         Ukrainian,
-        American,   
-        Asian,      
-        Italian     
+        American,
+        Asian,
+        Italian
     }
 
     public class Product : ObservableObject
@@ -39,7 +39,7 @@ namespace coursework.Models
         private CuisineType _cuisine;
         private decimal _costPrice;
         public Guid Id { get; } = Guid.NewGuid();
-        public int SalesCount { get; set; } = 0; 
+        public int SalesCount { get; set; } = 0;
         public string Name
         {
             get => _name;
@@ -61,9 +61,14 @@ namespace coursework.Models
             set
             {
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(CostPrice), "Собівартість не може бути від'ємною.");
-                SetProperty(ref _costPrice, value);
+                if (SetProperty(ref _costPrice, value))
+                    OnPropertyChanged(nameof(MarginPercent));
             }
         }
+
+        public string MarginPercent => Price > 0
+            ? $"{Math.Round((Price - CostPrice) / Price * 100, 1)}%"
+            : "—";
 
         public TimeSpan PreparationTime
         {

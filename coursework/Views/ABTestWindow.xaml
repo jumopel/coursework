@@ -2,64 +2,154 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-        Title="A/B Тестування планів фестивалю" Height="550" Width="850"
+        Title="A/B Тестування планів фестивалю" Height="750" Width="950"
         WindowStartupLocation="CenterOwner" Background="#F4F6F9">
+
+    <Window.Resources>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Gray" BlurRadius="6" Opacity="0.12"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="A/B Порівняння конфігурацій" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <TextBlock Text="A/B Порівняння конфігурацій" FontSize="24" FontWeight="Bold"
+                   Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,16"/>
 
-        <Grid Grid.Row="1" Margin="0,0,0,20">
+        <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="15">
-                <Border.Effect>
-                    <DropShadowEffect Color="Gray" BlurRadius="5" Opacity="0.1"/>
-                </Border.Effect>
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}">
                 <StackPanel>
-                    <TextBlock Text="ПЛАН А (Контрольний)" FontSize="14" FontWeight="Bold" Foreground="#3498DB" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding File1Name}" Foreground="#7F8C8D" Margin="0,0,0,10"/>
-                    <Button Content="📁 Вибрати JSON" Command="{Binding LoadFile1Command}" Background="#3498DB" Foreground="White" Height="30" BorderThickness="0"/>
+                    <TextBlock Text="ПЛАН А (Контрольний)" FontSize="13" FontWeight="Bold" Foreground="#3498DB" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding File1Name}" Foreground="#7F8C8D" Margin="0,0,0,8" TextTrimming="CharacterEllipsis"/>
+                    <Button Content="📁 Вибрати JSON" Command="{Binding LoadFile1Command}" 
+                            Background="#3498DB" Foreground="White" Height="30" BorderThickness="0"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2" Background="White" CornerRadius="8" Padding="15">
-                <Border.Effect>
-                    <DropShadowEffect Color="Gray" BlurRadius="5" Opacity="0.1"/>
-                </Border.Effect>
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
                 <StackPanel>
-                    <TextBlock Text="ПЛАН Б (Тестовий)" FontSize="14" FontWeight="Bold" Foreground="#E74C3C" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding File2Name}" Foreground="#7F8C8D" Margin="0,0,0,10"/>
-                    <Button Content="📁 Вибрати JSON" Command="{Binding LoadFile2Command}" Background="#E74C3C" Foreground="White" Height="30" BorderThickness="0"/>
+                    <TextBlock Text="ПЛАН Б (Тестовий)" FontSize="13" FontWeight="Bold" Foreground="#E74C3C" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding File2Name}" Foreground="#7F8C8D" Margin="0,0,0,8" TextTrimming="CharacterEllipsis"/>
+                    <Button Content="📁 Вибрати JSON" Command="{Binding LoadFile2Command}"
+                            Background="#E74C3C" Foreground="White" Height="30" BorderThickness="0"/>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="15">
-            <Border.Effect>
-                <DropShadowEffect Color="Gray" BlurRadius="5" Opacity="0.1"/>
-            </Border.Effect>
-            <lvc:CartesianChart Series="{Binding ComparisonChart}" LegendLocation="Right">
-                <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Labels="{Binding Labels}"/>
-                </lvc:CartesianChart.AxisX>
-                <lvc:CartesianChart.AxisY>
-                    <lvc:Axis LabelFormatter="{Binding Formatter}"/>
-                </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
+        <Grid Grid.Row="2" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="К-сть закладів" FontSize="12" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <lvc:CartesianChart Series="{Binding ShopsChart}" Height="160" LegendLocation="None">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding PlanLabels}" FontSize="11"/>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding IntFormatter}" FontSize="10"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="Середній чек (грн)" FontSize="12" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <lvc:CartesianChart Series="{Binding TicketChart}" Height="160" LegendLocation="None">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding PlanLabels}" FontSize="11"/>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding MoneyFormatter}" FontSize="10"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource CardStyle}" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="Теор. дохід/год (грн)" FontSize="12" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <lvc:CartesianChart Series="{Binding RevenueChart}" Height="160" LegendLocation="None">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding PlanLabels}" FontSize="11"/>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding MoneyFormatter}" FontSize="10"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Метрика" FontWeight="Bold" Foreground="#2C3E50" Padding="4"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="План А" FontWeight="Bold" Foreground="#3498DB" HorizontalAlignment="Center" Padding="4"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="План Б" FontWeight="Bold" Foreground="#E74C3C" HorizontalAlignment="Center" Padding="4"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="Різниця" FontWeight="Bold" Foreground="#7F8C8D" HorizontalAlignment="Center" Padding="4"/>
+
+                <Border Grid.Row="1" Grid.ColumnSpan="4" Background="#F8F9FA" Height="1" Margin="0,2"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="К-сть закладів" Padding="4,6"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ShopsA}" HorizontalAlignment="Center" Padding="4,6"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ShopsB}" HorizontalAlignment="Center" Padding="4,6"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding ShopsDiff}" HorizontalAlignment="Center" Padding="4,6" Foreground="{Binding ShopsDiffColor}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Середній чек (грн)" Padding="4,6"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TicketA}" HorizontalAlignment="Center" Padding="4,6"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding TicketB}" HorizontalAlignment="Center" Padding="4,6"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding TicketDiff}" HorizontalAlignment="Center" Padding="4,6" Foreground="{Binding TicketDiffColor}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Теор. дохід/год (грн)" Padding="4,6" FontWeight="Bold"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding RevenueA}" HorizontalAlignment="Center" Padding="4,6" FontWeight="Bold"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding RevenueB}" HorizontalAlignment="Center" Padding="4,6" FontWeight="Bold"/>
+                <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding RevenueDiff}" HorizontalAlignment="Center" Padding="4,6" FontWeight="Bold" Foreground="{Binding RevenueDiffColor}"/>
+            </Grid>
         </Border>
 
-        <Border Grid.Row="3" Background="#EAFAF1" BorderBrush="#2ECC71" BorderThickness="2" CornerRadius="8" Padding="15" Margin="0,20,0,0">
-            <TextBlock Text="{Binding Conclusion}" FontSize="16" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+        <Border Grid.Row="4" Background="{Binding ConclusionBackground}" BorderBrush="{Binding ConclusionBorder}"
+                BorderThickness="2" CornerRadius="8" Padding="14">
+            <TextBlock Text="{Binding Conclusion}" FontSize="15" FontWeight="Bold"
+                       Foreground="{Binding ConclusionForeground}" HorizontalAlignment="Center"/>
         </Border>
     </Grid>
 </Window>

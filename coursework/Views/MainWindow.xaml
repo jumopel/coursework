@@ -58,7 +58,6 @@
                             <Button Content="💾 Зберегти карту" Command="{Binding SaveMapCommand}" Width="150" Height="35" Margin="0,0,10,0" Background="#95A5A6" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                             <Button Content="📂 Завантажити" Command="{Binding LoadMapCommand}" Width="130" Height="35" Margin="0,0,20,0" Background="#7F8C8D" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                             <Border Width="1" Background="#E0E0E0" Margin="0,5,20,5"/>
-
                             <Button Content="➕ Додати зону" Command="{Binding OpenAddZoneCommand}" Width="130" Height="35" Margin="0,0,10,0" Background="#8E44AD" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                             <Button Content="➕ Додати заклад" Command="{Binding OpenAddShopCommand}" Width="140" Height="35" Margin="0,0,10,0" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                             <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" Width="150" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
@@ -76,13 +75,10 @@
                         <DataGridTextColumn Header="Людей" Binding="{Binding CurrentVisitors}" Width="Auto"/>
                         <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
                         <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
-
                         <DataGridTemplateColumn Header="Керування" Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="🗑 Видалити" 
-                                            Command="{Binding DataContext.DeleteZoneCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                            CommandParameter="{Binding}" 
+                                    <Button Content="🗑 Видалити" Command="{Binding DataContext.DeleteZoneCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" 
                                             Padding="15,2" Margin="5,0" Background="#E74C3C" Foreground="White" BorderThickness="0" Cursor="Hand"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -94,9 +90,7 @@
                             <Border Background="#FAFAFA" Padding="25,10,10,15" Margin="0,0,0,10">
                                 <StackPanel>
                                     <TextBlock Text="Заклади в цій зоні:" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,5"/>
-                                    <DataGrid ItemsSource="{Binding ShopsData}" AutoGenerateColumns="False" 
-                                              CanUserAddRows="False" IsReadOnly="True" 
-                                              Background="White" BorderThickness="1" BorderBrush="#D0D3D4">
+                                    <DataGrid ItemsSource="{Binding ShopsData}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="White" BorderThickness="1" BorderBrush="#D0D3D4">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Назва Закладу" Binding="{Binding ShopName}" Width="Auto"/>
                                             <DataGridTextColumn Header="Черга" Binding="{Binding CurrentQueue}" Width="Auto"/>
@@ -105,18 +99,13 @@
                                             <DataGridTextColumn Header="Каса (грн)" Binding="{Binding CurrentRevenue}" Width="Auto"/>
                                             <DataGridTextColumn Header="Касири" Binding="{Binding CashiersCount}" Width="Auto"/>
                                             <DataGridTextColumn Header="Кухарі" Binding="{Binding CooksCount}" Width="Auto"/>
-
                                             <DataGridTemplateColumn Width="100">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Button Content="📋 Меню" 
-                                                                Command="{Binding DataContext.OpenMenuCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                                CommandParameter="{Binding}"
-                                                                Background="#3498DB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="2" Padding="5"/>
+                                                        <Button Content="📋 Меню" Command="{Binding DataContext.OpenMenuCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Background="#3498DB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="2" Padding="5"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
-
                                             <DataGridTemplateColumn Header="Персонал" Width="Auto">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
@@ -138,45 +127,101 @@
         </TabItem>
 
         <TabItem Header="📊 Аналітика та Звіти" FontSize="16" FontWeight="SemiBold" Padding="15,10">
-            <Grid Margin="0,20,0,0">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Width="600">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,20,0,0">
+                <StackPanel Margin="30,0,30,30">
+                    <TextBlock Text="Аналітичний модуль GastroMetric" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,24"/>
 
-                    <TextBlock Text="Інформаційно-аналітичний модуль GastroMetric" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Background="White" CornerRadius="8" Padding="25" Margin="0,0,0,20">
+                        <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="22">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Opacity="0.06" BlurRadius="12" ShadowDepth="2"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <Border Background="#FFF3E0" CornerRadius="6" Padding="8,6" Margin="0,0,12,0">
+                                        <TextBlock Text="📊" FontSize="20"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Моніторинг реального часу" FontSize="15" FontWeight="Bold" Foreground="#2C3E50"/>
+                                        <TextBlock Text="KPI, графіки, черги" FontSize="11" Foreground="#95A5A6"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="Перегляд графіків, діаграм та показників KPI на основі поточної симуляції або завантажених даних." TextWrapping="Wrap" Foreground="#7F8C8D" FontSize="12" Margin="0,0,0,16" LineHeight="18"/>
+                                <Button Content="Відкрити Дашборд Аналітики" Command="{Binding OpenAnalyticsCommand}" Height="40" Background="#F39C12" Foreground="White" FontSize="13" FontWeight="Bold" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="22">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Opacity="0.06" BlurRadius="12" ShadowDepth="2"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <Border Background="#F3E5F5" CornerRadius="6" Padding="8,6" Margin="0,0,12,0">
+                                        <TextBlock Text="☁" FontSize="20"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Зовнішні дані" FontSize="15" FontWeight="Bold" Foreground="#2C3E50"/>
+                                        <TextBlock Text="CSV та хмарний API" FontSize="11" Foreground="#95A5A6"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="Завантажте касовий звіт або підключіться до хмарного API для аналізу реальних продажів фестивалю." TextWrapping="Wrap" Foreground="#7F8C8D" FontSize="12" Margin="0,0,0,16" LineHeight="18"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Імпорт CSV" Command="{Binding ImportCsvAndAnalyzeCommand}" Height="40" Background="#D35400" Foreground="White" FontSize="13" FontWeight="Bold" BorderThickness="0"/>
+                                    <Button Grid.Column="2" Content="Дані з API" Command="{Binding ImportApiCommand}" Height="40" Background="#8E44AD" Foreground="White" FontSize="13" FontWeight="Bold" BorderThickness="0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Background="White" CornerRadius="10" Padding="24">
                         <Border.Effect>
-                            <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
+                            <DropShadowEffect Color="White" Opacity="0.15" BlurRadius="14" ShadowDepth="3"/>
                         </Border.Effect>
-                        <StackPanel>
-                            <TextBlock Text="Моніторинг реального часу" FontSize="18" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,10"/>
-                            <TextBlock Text="Перегляд графіків, діаграм та показників KPI на основі поточної симуляції або завантажених даних." TextWrapping="Wrap" Foreground="#7F8C8D" Margin="0,0,0,20"/>
-                            <Button Content="Відкрити Дашборд Аналітики" Command="{Binding OpenAnalyticsCommand}" Height="45" Background="#F39C12" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="220"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Background="#2ECC71" CornerRadius="4" Padding="6,3" Margin="0,0,8,0">
+                                        <TextBlock Text="A" FontSize="13" FontWeight="Bold" Foreground="White"/>
+                                    </Border>
+                                    <Border Background="#E74C3C" CornerRadius="4" Padding="6,3" Margin="0,0,14,0">
+                                        <TextBlock Text="B" FontSize="13" FontWeight="Bold" Foreground="White"/>
+                                    </Border>
+                                    <TextBlock Text="A/B Тестування планів фестивалю" FontSize="17" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Завантажте два JSON-плани і порівняйте їх за кількістю закладів, середнім чеком та теоретичним доходом. Визначте найвигіднішу конфігурацію фестивалю." TextWrapping="Wrap" Foreground="Black" FontSize="12" LineHeight="18"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <Border Background="#2C3E50" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
+                                        <TextBlock Text="К-сть закладів" Foreground="#95A5A6" FontSize="11"/>
+                                    </Border>
+                                    <Border Background="#2C3E50" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
+                                        <TextBlock Text="Середній чек" Foreground="#95A5A6" FontSize="11"/>
+                                    </Border>
+                                    <Border Background="#2C3E50" CornerRadius="4" Padding="8,4">
+                                        <TextBlock Text="Дохід/год" Foreground="#95A5A6" FontSize="11"/>
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="Запустити A/B Тест" Command="{Binding OpenABTestCommand}" Height="46" Margin="20,0,0,0" Background="#2ECC71" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0" VerticalAlignment="Center"/>
+                        </Grid>
                     </Border>
-
-                    <Border Background="White" CornerRadius="8" Padding="25">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
-                        </Border.Effect>
-                        <StackPanel>
-                            <TextBlock Text="Зовнішні дані" FontSize="18" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,10"/>
-                            <TextBlock Text="Завантажте касовий звіт або підключіться до хмарного API для аналізу реальних продажів фестивалю." TextWrapping="Wrap" Foreground="#7F8C8D" Margin="0,0,0,20"/>
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Button Grid.Column="0" Content="📄 Імпорт CSV" Command="{Binding ImportCsvAndAnalyzeCommand}" Height="40" Background="#D35400" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0"/>
-                                <Button Grid.Column="2" Content="☁️ Дані з API" Command="{Binding ImportApiCommand}" Height="40" Background="#8E44AD" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0"/>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                    <Button Content="⚖️ A/B Тест планів" Command="{Binding OpenABTestCommand}" Height="40" Background="#34495E" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0" Margin="0,10,0,0"/>
                 </StackPanel>
-            </Grid>
+            </ScrollViewer>
         </TabItem>
     </TabControl>
 </Window>

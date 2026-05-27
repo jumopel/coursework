@@ -16,28 +16,57 @@ namespace coursework.ViewModels
 
         private string _newName = "Нова страва";
         private decimal _newPrice = 100;
+        private decimal _newCostPrice = 40;
         private double _newPrepTime = 3;
         private ProductCategory _selectedCategory = ProductCategory.MainCourse;
         private DietaryType _selectedDietaryTag = DietaryType.Standard;
 
         public string NewName { get => _newName; set => SetProperty(ref _newName, value); }
-        public decimal NewPrice { get => _newPrice; set => SetProperty(ref _newPrice, value); }
+        public decimal NewPrice
+        {
+            get => _newPrice;
+            set
+            {
+                SetProperty(ref _newPrice, value);
+                if (!_costPriceEditedManually)
+                    NewCostPrice = Math.Round(value * 0.4m, 2);
+            }
+        }
+        public decimal NewCostPrice
+        {
+            get => _newCostPrice;
+            set
+            {
+                _costPriceEditedManually = true;
+                SetProperty(ref _newCostPrice, value);
+                OnPropertyChanged(nameof(MarginPercent));
+                OnPropertyChanged(nameof(MarginHint));
+            }
+        }
         public double NewPrepTime { get => _newPrepTime; set => SetProperty(ref _newPrepTime, value); }
         public ProductCategory SelectedCategory { get => _selectedCategory; set => SetProperty(ref _selectedCategory, value); }
         public DietaryType SelectedDietaryTag { get => _selectedDietaryTag; set => SetProperty(ref _selectedDietaryTag, value); }
+
+        public string MarginPercent => NewPrice > 0
+            ? $"{Math.Round((NewPrice - NewCostPrice) / NewPrice * 100, 1)}%"
+            : "—";
+        public string MarginHint => NewPrice > 0
+            ? $"Маржа: {NewPrice - NewCostPrice:N2} грн ({MarginPercent})"
+            : "Введіть ціну";
 
         public List<ProductCategory> Categories { get; } = Enum.GetValues(typeof(ProductCategory)).Cast<ProductCategory>().ToList();
         public List<DietaryType> DietaryTags { get; } = Enum.GetValues(typeof(DietaryType)).Cast<DietaryType>().ToList();
 
         private bool _isEditing = false;
         private Product? _editingProduct;
+        private bool _costPriceEditedManually = false;
 
         public bool IsEditing { get => _isEditing; set => SetProperty(ref _isEditing, value); }
 
-        private string _submitButtonText = "Додати";
+        private string _submitButtonText = " Додати";
         public string SubmitButtonText { get => _submitButtonText; set => SetProperty(ref _submitButtonText, value); }
 
-        private string _submitButtonColor = "#27AE60"; 
+        private string _submitButtonColor = "#27AE60";
         public string SubmitButtonColor { get => _submitButtonColor; set => SetProperty(ref _submitButtonColor, value); }
 
         public ICommand SubmitProductCommand { get; }
@@ -50,7 +79,7 @@ namespace coursework.ViewModels
             _shop = shop;
 
             SubmitProductCommand = new RelayCommand(_ => SubmitProduct(), _ =>
-                !string.IsNullOrWhiteSpace(NewName) && NewPrice > 0 && NewPrepTime > 0);
+                !string.IsNullOrWhiteSpace(NewName) && NewPrice > 0 && NewPrepTime > 0 && NewCostPrice >= 0 && NewCostPrice < NewPrice);
 
             RemoveProductCommand = new RelayCommand(param => RemoveProduct(param as Product));
             StartEditCommand = new RelayCommand(param => StartEdit(param as Product));
@@ -63,18 +92,16 @@ namespace coursework.ViewModels
             {
                 _editingProduct.Name = NewName;
                 _editingProduct.Price = NewPrice;
-                _editingProduct.CostPrice = NewPrice * 0.4m;
+                _editingProduct.CostPrice = NewCostPrice;
                 _editingProduct.PreparationTime = TimeSpan.FromMinutes(NewPrepTime);
                 _editingProduct.Category = SelectedCategory;
                 _editingProduct.DietaryTag = SelectedDietaryTag;
 
                 int index = MenuItems.IndexOf(_editingProduct);
                 if (index >= 0)
-                {
                     MenuItems[index] = _editingProduct;
-                }
 
-                CancelEdit(); 
+                CancelEdit();
             }
             else
             {
@@ -82,7 +109,7 @@ namespace coursework.ViewModels
                 {
                     Name = NewName,
                     Price = NewPrice,
-                    CostPrice = NewPrice * 0.4m,
+                    CostPrice = NewCostPrice,
                     PreparationTime = TimeSpan.FromMinutes(NewPrepTime),
                     Cuisine = _shop.ShopCuisine,
                     Category = SelectedCategory,
@@ -90,6 +117,8 @@ namespace coursework.ViewModels
                 };
                 MenuItems.Add(product);
                 NewName = "Ще одна страва";
+                _costPriceEditedManually = false;
+                NewPrice = 100;
             }
         }
 
@@ -98,9 +127,11 @@ namespace coursework.ViewModels
             if (p == null) return;
 
             _editingProduct = p;
+            _costPriceEditedManually = true; 
 
             NewName = p.Name;
             NewPrice = p.Price;
+            NewCostPrice = p.CostPrice;
             NewPrepTime = p.PreparationTime.TotalMinutes;
             SelectedCategory = p.Category;
             SelectedDietaryTag = p.DietaryTag;
@@ -114,12 +145,14 @@ namespace coursework.ViewModels
         {
             _editingProduct = null;
             IsEditing = false;
+            _costPriceEditedManually = false;
 
             SubmitButtonText = " Додати";
             SubmitButtonColor = "#27AE60";
 
             NewName = "Нова страва";
             NewPrice = 100;
+            NewCostPrice = 40;
             NewPrepTime = 3;
         }
 
@@ -128,7 +161,6 @@ namespace coursework.ViewModels
             if (p != null && MenuItems.Contains(p))
             {
                 MenuItems.Remove(p);
-
                 if (p == _editingProduct) CancelEdit();
             }
         }

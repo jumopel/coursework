@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Windows.Input;
+using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Wpf;
 using coursework.Commands;
@@ -22,15 +23,45 @@ namespace coursework.ViewModels
         private string _conclusion = "Завантажте два файли для порівняння";
         public string Conclusion { get => _conclusion; set => SetProperty(ref _conclusion, value); }
 
-        public SeriesCollection ComparisonChart { get; set; } = new SeriesCollection();
-        public List<string> Labels { get; set; } = new List<string> { "К-сть закладів", "Середній чек (грн)", "Теоретичний дохід/год" };
-        public Func<double, string> Formatter { get; set; } = value => value.ToString("N0");
+        private Brush _conclusionBackground = Brushes.White;
+        public Brush ConclusionBackground { get => _conclusionBackground; set => SetProperty(ref _conclusionBackground, value); }
+
+        private Brush _conclusionBorder = new SolidColorBrush(Color.FromRgb(189, 195, 199));
+        public Brush ConclusionBorder { get => _conclusionBorder; set => SetProperty(ref _conclusionBorder, value); }
+
+        private Brush _conclusionForeground = new SolidColorBrush(Color.FromRgb(127, 140, 141));
+        public Brush ConclusionForeground { get => _conclusionForeground; set => SetProperty(ref _conclusionForeground, value); }
+
+        public SeriesCollection ShopsChart { get; set; } = new SeriesCollection();
+        public SeriesCollection TicketChart { get; set; } = new SeriesCollection();
+        public SeriesCollection RevenueChart { get; set; } = new SeriesCollection();
+
+        public List<string> PlanLabels { get; set; } = new List<string> { "А", "Б" };
+        public Func<double, string> IntFormatter { get; set; } = v => v.ToString("N0");
+        public Func<double, string> MoneyFormatter { get; set; } = v => v.ToString("N0") + " ₴";
+
+        private string _shopsA = "—"; public string ShopsA { get => _shopsA; set => SetProperty(ref _shopsA, value); }
+        private string _shopsB = "—"; public string ShopsB { get => _shopsB; set => SetProperty(ref _shopsB, value); }
+        private string _shopsDiff = "—"; public string ShopsDiff { get => _shopsDiff; set => SetProperty(ref _shopsDiff, value); }
+        private Brush _shopsDiffColor = Brushes.Gray; public Brush ShopsDiffColor { get => _shopsDiffColor; set => SetProperty(ref _shopsDiffColor, value); }
+
+        private string _ticketA = "—"; public string TicketA { get => _ticketA; set => SetProperty(ref _ticketA, value); }
+        private string _ticketB = "—"; public string TicketB { get => _ticketB; set => SetProperty(ref _ticketB, value); }
+        private string _ticketDiff = "—"; public string TicketDiff { get => _ticketDiff; set => SetProperty(ref _ticketDiff, value); }
+        private Brush _ticketDiffColor = Brushes.Gray; public Brush TicketDiffColor { get => _ticketDiffColor; set => SetProperty(ref _ticketDiffColor, value); }
+
+        private string _revenueA = "—"; public string RevenueA { get => _revenueA; set => SetProperty(ref _revenueA, value); }
+        private string _revenueB = "—"; public string RevenueB { get => _revenueB; set => SetProperty(ref _revenueB, value); }
+        private string _revenueDiff = "—"; public string RevenueDiff { get => _revenueDiff; set => SetProperty(ref _revenueDiff, value); }
+        private Brush _revenueDiffColor = Brushes.Gray; public Brush RevenueDiffColor { get => _revenueDiffColor; set => SetProperty(ref _revenueDiffColor, value); }
 
         public ICommand LoadFile1Command { get; }
         public ICommand LoadFile2Command { get; }
 
         private double[] _planAStats = new double[3];
         private double[] _planBStats = new double[3];
+        private bool _plan1Loaded = false;
+        private bool _plan2Loaded = false;
 
         public ABTestViewModel()
         {
@@ -48,13 +79,15 @@ namespace coursework.ViewModels
                 {
                     File1Name = Path.GetFileName(dialog.FileName);
                     _planAStats = stats;
+                    _plan1Loaded = true;
                 }
                 else
                 {
                     File2Name = Path.GetFileName(dialog.FileName);
                     _planBStats = stats;
+                    _plan2Loaded = true;
                 }
-                UpdateChart();
+                UpdateCharts();
             }
         }
 
@@ -96,11 +129,13 @@ namespace coursework.ViewModels
                                     }
                                 }
 
+                                totalMenuPrice += totalShopPrice;
+                                menuItemsCount += menuCount;
+
                                 if (menuCount > 0)
                                 {
                                     double avgTime = totalShopTime / menuCount;
                                     double avgPrice = totalShopPrice / menuCount;
-
                                     hourlyRevenuePotential += (60.0 / avgTime) * cooks * avgPrice;
                                 }
                             }
@@ -117,31 +152,76 @@ namespace coursework.ViewModels
             }
         }
 
-        private void UpdateChart()
+        private void UpdateCharts()
         {
-            ComparisonChart.Clear();
-            ComparisonChart.Add(new ColumnSeries
-            {
-                Title = "План А (" + File1Name + ")",
-                Values = new ChartValues<double>(_planAStats),
-                Fill = System.Windows.Media.Brushes.DodgerBlue
-            });
-            ComparisonChart.Add(new ColumnSeries
-            {
-                Title = "План Б (" + File2Name + ")",
-                Values = new ChartValues<double>(_planBStats),
-                Fill = System.Windows.Media.Brushes.Tomato
-            });
+            var colorA = new SolidColorBrush(Color.FromRgb(52, 152, 219));   
+            var colorB = new SolidColorBrush(Color.FromRgb(231, 76, 60));    
 
-            if (_planAStats[2] > 0 && _planBStats[2] > 0)
+            // Графік закладів
+            ShopsChart.Clear();
+            ShopsChart.Add(new ColumnSeries { Title = "А", Values = new ChartValues<double> { _planAStats[0] }, Fill = colorA, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") });
+            ShopsChart.Add(new ColumnSeries { Title = "Б", Values = new ChartValues<double> { _planBStats[0] }, Fill = colorB, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") });
+
+            // Графік середнього чека
+            TicketChart.Clear();
+            TicketChart.Add(new ColumnSeries { Title = "А", Values = new ChartValues<double> { _planAStats[1] }, Fill = colorA, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") + " ₴" });
+            TicketChart.Add(new ColumnSeries { Title = "Б", Values = new ChartValues<double> { _planBStats[1] }, Fill = colorB, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") + " ₴" });
+
+            // Графік доходу
+            RevenueChart.Clear();
+            RevenueChart.Add(new ColumnSeries { Title = "А", Values = new ChartValues<double> { _planAStats[2] }, Fill = colorA, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") + " ₴" });
+            RevenueChart.Add(new ColumnSeries { Title = "Б", Values = new ChartValues<double> { _planBStats[2] }, Fill = colorB, DataLabels = true, LabelPoint = p => p.Y.ToString("N0") + " ₴" });
+
+            // Таблиця
+            ShopsA = _planAStats[0].ToString("N0");
+            ShopsB = _planBStats[0].ToString("N0");
+            UpdateDiff(_planAStats[0], _planBStats[0], v => v.ToString("N0"),
+                out string sd, out Brush sc); ShopsDiff = sd; ShopsDiffColor = sc;
+
+            TicketA = _planAStats[1].ToString("N2") + " ₴";
+            TicketB = _planBStats[1].ToString("N2") + " ₴";
+            UpdateDiff(_planAStats[1], _planBStats[1], v => v.ToString("N2") + " ₴",
+                out string td, out Brush tc); TicketDiff = td; TicketDiffColor = tc;
+
+            RevenueA = _planAStats[2].ToString("N0") + " ₴";
+            RevenueB = _planBStats[2].ToString("N0") + " ₴";
+            UpdateDiff(_planAStats[2], _planBStats[2], v => v.ToString("N0") + " ₴",
+                out string rd, out Brush rc); RevenueDiff = rd; RevenueDiffColor = rc;
+
+            if (_plan1Loaded && _plan2Loaded)
             {
-                if (_planAStats[2] > _planBStats[2])
-                    Conclusion = $"План А вигідніший! Очікуваний дохід на {Math.Round(_planAStats[2] - _planBStats[2], 2)} грн/год більший.";
-                else if (_planBStats[2] > _planAStats[2])
-                    Conclusion = $"План Б вигідніший! Очікуваний дохід на {Math.Round(_planBStats[2] - _planAStats[2], 2)} грн/год більший.";
+                double a = _planAStats[2], b = _planBStats[2];
+                if (a > b)
+                {
+                    Conclusion = $"✅ План А вигідніший! Дохід більший на {Math.Round(a - b, 0):N0} ₴/год ({Math.Round((a - b) / b * 100, 1)}%)";
+                    ConclusionBackground = new SolidColorBrush(Color.FromRgb(234, 250, 241));
+                    ConclusionBorder = new SolidColorBrush(Color.FromRgb(46, 204, 113));
+                    ConclusionForeground = new SolidColorBrush(Color.FromRgb(39, 174, 96));
+                }
+                else if (b > a)
+                {
+                    Conclusion = $"✅ План Б вигідніший! Дохід більший на {Math.Round(b - a, 0):N0} ₴/год ({Math.Round((b - a) / a * 100, 1)}%)";
+                    ConclusionBackground = new SolidColorBrush(Color.FromRgb(253, 237, 236));
+                    ConclusionBorder = new SolidColorBrush(Color.FromRgb(231, 76, 60));
+                    ConclusionForeground = new SolidColorBrush(Color.FromRgb(192, 57, 43));
+                }
                 else
-                    Conclusion = "Обидва плани однаково прибуткові.";
+                {
+                    Conclusion = "⚖️ Обидва плани однаково прибуткові.";
+                    ConclusionBackground = new SolidColorBrush(Color.FromRgb(234, 250, 241));
+                    ConclusionBorder = new SolidColorBrush(Color.FromRgb(46, 204, 113));
+                    ConclusionForeground = new SolidColorBrush(Color.FromRgb(39, 174, 96));
+                }
             }
+        }
+
+        private void UpdateDiff(double a, double b, Func<double, string> fmt, out string text, out Brush color)
+        {
+            if (!_plan1Loaded || !_plan2Loaded) { text = "—"; color = Brushes.Gray; return; }
+            double diff = b - a;
+            if (diff > 0) { text = "+" + fmt(diff); color = new SolidColorBrush(Color.FromRgb(39, 174, 96)); }
+            else if (diff < 0) { text = fmt(diff); color = new SolidColorBrush(Color.FromRgb(192, 57, 43)); }
+            else { text = "="; color = Brushes.Gray; }
         }
     }
 }
