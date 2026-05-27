@@ -49,8 +49,7 @@ namespace coursework.Core
             set => SetProperty(ref _height, value);
         }
 
-        public ObservableCollection<BaseShop> Shops { get; private set; }
-
+        public ObservableCollection<BaseShop> Shops { get; set; } = new ObservableCollection<BaseShop>();
         public decimal TotalRevenue => Shops.Sum(s => s.Revenue);
         public decimal TotalNetProfit => Shops.Sum(s => s.NetProfit);
 

@@ -30,6 +30,8 @@ namespace coursework.ViewModels
         public ICommand OpenAddZoneCommand { get; }
         public ICommand DeleteZoneCommand { get; }
         public ICommand OpenMenuCommand { get; }
+        public ICommand SaveMapCommand { get; }
+        public ICommand LoadMapCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -105,7 +107,8 @@ namespace coursework.ViewModels
 
                 window.ShowDialog();
             });
-
+            SaveMapCommand = new RelayCommand(_ => SaveMap());
+            LoadMapCommand = new RelayCommand(_ => LoadMap(), _ => !_engine.IsRunning); 
             OpenAddZoneCommand = new RelayCommand(_ =>
             {
                 var addZoneVm = new AddZoneViewModel(_engine);
@@ -286,6 +289,28 @@ namespace coursework.ViewModels
                     Owner = System.Windows.Application.Current.MainWindow
                 };
                 window.ShowDialog();
+            }
+        }
+        private void SaveMap()
+        {
+            var saveService = new coursework.Services.SaveLoadService();
+            saveService.SaveMapToFile(_engine.Zones);
+        }
+
+        private void LoadMap()
+        {
+            var saveService = new coursework.Services.SaveLoadService();
+            var loadedZones = saveService.LoadMapFromFile();
+
+            if (loadedZones != null)
+            {
+                _engine.Zones.Clear();
+                foreach (var zone in loadedZones)
+                {
+                    _engine.Zones.Add(zone);
+                }
+                UpdateSnapshot();
+                System.Windows.MessageBox.Show("Карту успішно завантажено! Можете відкривати редактор.", "Успіх", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
         }
 

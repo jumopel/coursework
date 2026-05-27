@@ -9,7 +9,7 @@ namespace coursework.Core
     public class BaseShop : FestivalElement
     {
         public enum ShopType { FastFood, Restaurant }
-        public ObservableCollection<Product> Menu { get; } = new ObservableCollection<Product>();
+        public ObservableCollection<Product> Menu { get; set; } = new ObservableCollection<Product>();
 
         private double _baseAttractiveness = 1.0;
         private decimal _revenue;

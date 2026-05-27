@@ -25,49 +25,44 @@
             </Border.Effect>
 
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Button Content="▶ Старт" Command="{Binding StartCommand}" 
-                            Width="90" Height="35" Margin="0,0,10,0" 
-                            Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
-
-                    <Button Content="⏸ Пауза" Command="{Binding PauseCommand}" 
-                            Width="90" Height="35" 
-                            Background="#F44336" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,15">
+                    <Button Content="▶ Старт" Command="{Binding StartCommand}" Width="90" Height="35" Margin="0,0,10,0" Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                    <Button Content="⏸ Пауза" Command="{Binding PauseCommand}" Width="90" Height="35" Background="#F44336" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,15">
                     <TextBlock Text="Ігровий час:" FontSize="16" Foreground="#555" Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding ElapsedTimeText}" FontSize="22" FontWeight="Bold" Foreground="#2C3E50"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
                     <TextBlock Text="Швидкість:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#555"/>
                     <Button Content="1x" Command="{Binding SetSpeed1XCommand}" Width="40" Height="30" Margin="0,0,5,0" Background="#E0E0E0" BorderThickness="0"/>
                     <Button Content="2x" Command="{Binding SetSpeed2XCommand}" Width="40" Height="30" Margin="0,0,5,0" Background="#E0E0E0" BorderThickness="0"/>
                     <Button Content="4x" Command="{Binding SetSpeed4XCommand}" Width="40" Height="30" Background="#E0E0E0" BorderThickness="0"/>
-                    <Button Content="➕ Додати зону" Command="{Binding OpenAddZoneCommand}"  Width="120" Height="35" Margin="15,0,0,0" Background="#8E44AD" Foreground="White" FontWeight="Bold" BorderThickness="0">
-                        <Button.Effect>
-                            <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="4" ShadowDepth="1"/>
-                        </Button.Effect>
-                    </Button>
+                </StackPanel>
 
-                    <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" 
-                            Width="140" Height="35" Margin="15,0,0,0" 
-                            Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="Button_Click"/>
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
 
-                    <Button Content="➕ Додати заклад" Command="{Binding OpenAddShopCommand}" 
-                            Width="140" Height="35" Margin="10,0,0,0" 
-                            Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0">
-                        <Button.Effect>
-                            <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="4" ShadowDepth="1"/>
-                        </Button.Effect>
-                    </Button>
+                    <Button Content="💾 Зберегти карту" Command="{Binding SaveMapCommand}" Width="150" Height="35" Margin="0,0,10,0" Background="#95A5A6" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                    <Button Content="📂 Завантажити" Command="{Binding LoadMapCommand}" Width="130" Height="35" Margin="0,0,20,0" Background="#7F8C8D" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+
+                    <Border Width="1" Background="#E0E0E0" Margin="0,5,20,5"/>
+
+                    <Button Content="➕ Додати зону" Command="{Binding OpenAddZoneCommand}" Width="130" Height="35" Margin="0,0,10,0" Background="#8E44AD" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                    <Button Content="➕ Додати заклад" Command="{Binding OpenAddShopCommand}" Width="140" Height="35" Margin="0,0,10,0" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                    <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" Width="150" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                 </StackPanel>
             </Grid>
         </Border>
