@@ -29,6 +29,7 @@ namespace coursework.ViewModels
         public ICommand HireCookCommand { get; }
         public ICommand OpenAddZoneCommand { get; }
         public ICommand DeleteZoneCommand { get; }
+        public ICommand OpenMenuCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -59,6 +60,7 @@ namespace coursework.ViewModels
             _engine = new SimulationEngine();
             _dataProvider = new SimulationDataProvider(_engine);
             _dataService = new DataService();
+            OpenMenuCommand = new RelayCommand(param => OpenMenu(param as coursework.DTO.ShopStateDto)); 
             StartCommand = new RelayCommand(_ =>
             {
                 _dataProvider.SendCommand("START");
@@ -103,6 +105,7 @@ namespace coursework.ViewModels
 
                 window.ShowDialog();
             });
+
             OpenAddZoneCommand = new RelayCommand(_ =>
             {
                 var addZoneVm = new AddZoneViewModel(_engine);
@@ -151,7 +154,7 @@ namespace coursework.ViewModels
             var freshZonesSnapshot = _dataProvider.GetZonesSnapshot().ToList();
 
             if (Zones.Count == 0 || Zones.Count != freshZonesSnapshot.Count ||
-                Zones.Any(z => z.ShopsData.Count != freshZonesSnapshot.First(f => f.ZoneName == z.ZoneName).ShopsData.Count))
+                Zones.Any(z => z.ShopsData.Count != freshZonesSnapshot.First(f => f.ZoneId == z.ZoneId).ShopsData.Count))
             {
                 Zones.Clear();
                 foreach (var zoneDto in freshZonesSnapshot) Zones.Add(zoneDto);
@@ -161,7 +164,8 @@ namespace coursework.ViewModels
             for (int i = 0; i < Zones.Count; i++)
             {
                 var currentZone = Zones[i];
-                var freshZone = freshZonesSnapshot.FirstOrDefault(z => z.ZoneName == currentZone.ZoneName);
+
+                var freshZone = freshZonesSnapshot.FirstOrDefault(z => z.ZoneId == currentZone.ZoneId);
                 if (freshZone != null)
                 {
                     currentZone.CurrentVisitors = freshZone.CurrentVisitors;
@@ -171,7 +175,8 @@ namespace coursework.ViewModels
                     for (int j = 0; j < currentZone.ShopsData.Count; j++)
                     {
                         var currentShop = currentZone.ShopsData[j];
-                        var freshShop = freshZone.ShopsData.FirstOrDefault(s => s.ShopName == currentShop.ShopName);
+
+                        var freshShop = freshZone.ShopsData.FirstOrDefault(s => s.ShopId == currentShop.ShopId);
                         if (freshShop != null)
                         {
                             currentShop.CurrentQueue = freshShop.CurrentQueue;
@@ -185,7 +190,7 @@ namespace coursework.ViewModels
                 }
             }
         }
-        
+
 
         private void InitializeDemoData()
         {
@@ -239,18 +244,19 @@ namespace coursework.ViewModels
         private void HireStaff(coursework.DTO.ShopStateDto? dto, bool isCashier)
         {
             if (dto == null) return;
-            var shop = _engine.Zones.SelectMany(z => z.Shops).FirstOrDefault(s => s.Name == dto.ShopName);
+
+            var shop = _engine.Zones.SelectMany(z => z.Shops).FirstOrDefault(s => s.Id == dto.ShopId);
             if (shop != null)
             {
                 if (isCashier)
                 {
                     shop.CashiersCount++;
-                    shop.StaffsDailySalary += 500; 
+                    shop.StaffsDailySalary += 500;
                 }
                 else
                 {
                     shop.CooksCount++;
-                    shop.StaffsDailySalary += 700; 
+                    shop.StaffsDailySalary += 700;
                 }
                 UpdateSnapshot();
             }
@@ -259,13 +265,29 @@ namespace coursework.ViewModels
         {
             if (dto == null) return;
 
-            var zoneToRemove = _engine.Zones.FirstOrDefault(z => z.Name == dto.ZoneName);
+            var zoneToRemove = _engine.Zones.FirstOrDefault(z => z.Id == dto.ZoneId);
             if (zoneToRemove != null)
             {
                 _engine.Zones.Remove(zoneToRemove);
-                UpdateSnapshot(); 
+                UpdateSnapshot();
             }
         }
-       
+        private void OpenMenu(coursework.DTO.ShopStateDto? dto)
+        {
+            if (dto == null) return;
+
+            var shop = _engine.Zones.SelectMany(z => z.Shops).FirstOrDefault(s => s.Id == dto.ShopId);
+            if (shop != null)
+            {
+                var vm = new EditMenuViewModel(shop);
+                var window = new coursework.Views.EditMenuWindow
+                {
+                    DataContext = vm,
+                    Owner = System.Windows.Application.Current.MainWindow
+                };
+                window.ShowDialog();
+            }
+        }
+
     }
 }

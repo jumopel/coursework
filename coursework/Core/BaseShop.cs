@@ -11,7 +11,7 @@ namespace coursework.Core
         public enum ShopType { FastFood, Restaurant }
         public ObservableCollection<Product> Menu { get; } = new ObservableCollection<Product>();
 
-        private double _baseAttractiveness = 15.0;
+        private double _baseAttractiveness = 1.0;
         private decimal _revenue;
         private decimal _totalConsumablesCost;
         private decimal _averageCheck;

@@ -116,7 +116,17 @@
 
                                     <DataGridTextColumn Header="Касири" Binding="{Binding CashiersCount}" Width="Auto"/>
                                     <DataGridTextColumn Header="Кухарі" Binding="{Binding CooksCount}" Width="Auto"/>
-
+                                    <DataGridTemplateColumn Width="100">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="📋 Меню" 
+                    Command="{Binding DataContext.OpenMenuCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                    CommandParameter="{Binding}"
+                    Background="#3498DB" Foreground="White" FontWeight="Bold" BorderThickness="0"
+                    Margin="2" Padding="5"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTemplateColumn Header="Керування персоналом" Width="Auto">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
