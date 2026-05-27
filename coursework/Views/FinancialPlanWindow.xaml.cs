@@ -1,18 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
+using coursework.Core;
 using coursework.DTO;
 
 namespace coursework.Views
 {
     public partial class FinancialPlanWindow : Window
     {
-        public IEnumerable<ShopStateDto> ShopsData { get; set; }
+        private readonly IFestivalDataProvider _dataProvider;
+        private readonly DispatcherTimer _timer;
 
-        public FinancialPlanWindow(IEnumerable<ShopStateDto> shopsData)
+        public ObservableCollection<ShopStateDto> ShopsData { get; set; }
+
+        public FinancialPlanWindow(IFestivalDataProvider dataProvider)
         {
             InitializeComponent();
-            ShopsData = shopsData;
-            DataContext = this; 
+            _dataProvider = dataProvider;
+
+            ShopsData = new ObservableCollection<ShopStateDto>(_dataProvider.GetShopsSnapshot());
+            DataContext = this;
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Tick += (s, e) => UpdateData();
+            _timer.Start();
+
+            this.Closed += (s, e) => _timer.Stop();
+        }
+
+        private void UpdateData()
+        {
+            var freshData = _dataProvider.GetShopsSnapshot();
+
+            ShopsData.Clear();
+            foreach (var shop in freshData)
+            {
+                ShopsData.Add(shop);
+            }
         }
     }
 }

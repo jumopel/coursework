@@ -30,6 +30,7 @@ namespace coursework.DTO
         public double BreakEvenProgress { get; set; } 
         public string BreakEvenStatus => BreakEvenProgress >= 100 ? "Окупився" : "В мінусі";
         public string ProgressColor => BreakEvenProgress >= 100 ? "#27AE60" : "#E74C3C";
+        public string EstimatedPayoff { get; set; } = string.Empty;
         public System.Collections.Generic.List<ProductStatsDto> MenuStats { get; set; } = new System.Collections.Generic.List<ProductStatsDto>();
     }
 }

@@ -16,7 +16,7 @@ namespace coursework.Services
                 Title = "Зберегти розширений звіт",
                 Filter = "Excel Files (*.xlsx)|*.xlsx",
                 DefaultExt = ".xlsx",
-                FileName = $"_Аналітика_{DateTime.Now:yyyyMMdd_HHmm}"
+                FileName = $"GastroMetric_Аналітика_{DateTime.Now:yyyyMMdd_HHmm}"
             };
 
             if (dialog.ShowDialog() == true)
@@ -53,7 +53,6 @@ namespace coursework.Services
                             rowZ++;
                         }
                         wsZones.Columns().AdjustToContents();
-
                         var wsShops = workbook.Worksheets.Add("Аналітика Закладів");
                         wsShops.Cell("A1").Value = "Детальна бізнес-аналітика кожного закладу";
                         wsShops.Range("A1:J1").Merge().Style.Font.SetBold().Font.SetFontSize(16).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -85,6 +84,48 @@ namespace coursework.Services
                             }
                         }
                         wsShops.Columns().AdjustToContents();
+
+                        var wsAbc = workbook.Worksheets.Add("ABC-Аналіз та Маржа");
+                        wsAbc.Cell("A1").Value = "ABC-Класифікація страв та показники рентабельності";
+                        wsAbc.Range("A1:H1").Merge().Style.Font.SetBold().Font.SetFontSize(16).Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                        var headersA = new[] { "Заклад", "Страва", "Ціна (грн)", "Собівартість (грн)", "Маржа (%)", "Продажі (шт)", "Валовий Прибуток", "Клас (ABC)" };
+                        for (int i = 0; i < headersA.Length; i++) wsAbc.Cell(3, i + 1).Value = headersA[i];
+                        wsAbc.Range("A3:H3").Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.LightGreen);
+
+                        var allProducts = zonesSnapshot.SelectMany(z => z.ShopsData)
+                                                       .SelectMany(s => s.MenuStats)
+                                                       .Where(p => p.SalesCount > 0)
+                                                       .OrderByDescending(p => p.TotalProfit)
+                                                       .ToList();
+
+                        decimal totalProfit = allProducts.Sum(p => p.TotalProfit);
+                        decimal cumulative = 0;
+                        int rowA = 4;
+
+                        foreach (var p in allProducts)
+                        {
+                            cumulative += p.TotalProfit;
+                            double cumulativePercent = totalProfit > 0 ? (double)(cumulative / totalProfit) * 100 : 0;
+                            string category = cumulativePercent <= 80 ? "A (Флагман)" : cumulativePercent <= 95 ? "B (Середняк)" : "C (Аутсайдер)";
+
+                            wsAbc.Cell(rowA, 1).Value = p.ShopName;
+                            wsAbc.Cell(rowA, 2).Value = p.ProductName;
+                            wsAbc.Cell(rowA, 3).Value = p.Price;
+                            wsAbc.Cell(rowA, 4).Value = p.CostPrice;
+                            wsAbc.Cell(rowA, 5).Value = Math.Round(p.MarginPercent, 1) + "%";
+                            wsAbc.Cell(rowA, 6).Value = p.SalesCount;
+                            wsAbc.Cell(rowA, 7).Value = p.TotalProfit;
+
+                            var classCell = wsAbc.Cell(rowA, 8);
+                            classCell.Value = category;
+                            if (category.StartsWith("A")) classCell.Style.Font.SetFontColor(XLColor.ForestGreen).Font.SetBold();
+                            else if (category.StartsWith("B")) classCell.Style.Font.SetFontColor(XLColor.DarkOrange).Font.SetBold();
+                            else classCell.Style.Font.SetFontColor(XLColor.Red).Font.SetBold();
+
+                            rowA++;
+                        }
+                        wsAbc.Columns().AdjustToContents();
 
                         workbook.SaveAs(dialog.FileName);
                     }

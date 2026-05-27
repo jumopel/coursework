@@ -106,6 +106,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Порівняння зон -->
             <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20">
                 <Border.Effect>
                     <DropShadowEffect Color="Gray" BlurRadius="10" ShadowDepth="2" Opacity="0.15"/>
@@ -115,8 +116,20 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Частка прибутку по зонах" FontSize="16" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" HorizontalAlignment="Center"/>
-                    <lvc:PieChart Grid.Row="1" Series="{Binding RevenueByZoneChart}" LegendLocation="Bottom" Hoverable="True" DataTooltip="{x:Null}"/>
+                    <TextBlock Text="Фінанси по зонах (Виручка / Витрати / Прибуток)" FontSize="16" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+                    <lvc:CartesianChart Grid.Row="1" Series="{Binding ZoneComparisonChart}" LegendLocation="Bottom">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding ZoneLabels}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="Сума (грн)" LabelFormatter="{Binding Formatter}"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
                 </Grid>
             </Border>
 

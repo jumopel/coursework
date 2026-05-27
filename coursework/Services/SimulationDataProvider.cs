@@ -10,7 +10,7 @@ namespace coursework.Services
     {
         private readonly SimulationEngine _engine;
 
-        public string ProviderName => " ";
+        public string ProviderName => "Simulation Provider";
 
         public event Action? DataUpdated;
 
@@ -32,12 +32,12 @@ namespace coursework.Services
             {
                 var zoneDto = new ZoneStateDto
                 {
-                    ZoneId = zone.Id,                 
-                    ZoneName = zone.Name,             
-                    Theme = zone.Theme,               
-                    TotalRevenue = zone.TotalRevenue, 
-                    CurrentVisitors = zone.CurrentVisitors, 
-                    OccupancyRate = Math.Round(zone.OccupancyRate * 100, 1), 
+                    ZoneId = zone.Id,
+                    ZoneName = zone.Name,
+                    Theme = zone.Theme,
+                    TotalRevenue = zone.TotalRevenue,
+                    CurrentVisitors = zone.CurrentVisitors,
+                    OccupancyRate = Math.Round(zone.OccupancyRate * 100, 1),
                     ShopsData = new List<ShopStateDto>()
                 };
 
@@ -45,6 +45,25 @@ namespace coursework.Services
                 {
                     var topDish = shop.Menu.OrderByDescending(p => p.SalesCount).FirstOrDefault();
                     var worstDish = shop.Menu.OrderBy(p => p.SalesCount).FirstOrDefault();
+
+                    decimal fixedCosts = shop.BaseRent + shop.StaffsDailySalary;
+                    decimal remainingCosts = fixedCosts - shop.Revenue;
+                    decimal avgCheck = shop.TotalOrders > 0 ? shop.Revenue / shop.TotalOrders : 0;
+
+                    string payoffForecast;
+                    if (remainingCosts <= 0)
+                    {
+                        payoffForecast = "✅ Приносить чистий прибуток";
+                    }
+                    else if (avgCheck > 0)
+                    {
+                        int clientsNeeded = (int)Math.Ceiling(remainingCosts / avgCheck);
+                        payoffForecast = $"⏳ Ще ~{clientsNeeded} замовлень";
+                    }
+                    else
+                    {
+                        payoffForecast = "⚠️ Чекаємо першого клієнта";
+                    }
 
                     zoneDto.ShopsData.Add(new ShopStateDto
                     {
@@ -56,15 +75,18 @@ namespace coursework.Services
                         Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
                         CashiersCount = shop.CashiersCount,
                         CooksCount = shop.CooksCount,
-                        TotalExpenses = shop.BaseRent + shop.StaffsDailySalary,
-                        NetProfit = shop.Revenue - (shop.BaseRent + shop.StaffsDailySalary),
+                        TotalExpenses = fixedCosts,
+                        NetProfit = shop.Revenue - fixedCosts,
                         TotalOrders = shop.TotalOrders,
-                        AverageTicket = shop.TotalOrders > 0 ? Math.Round(shop.Revenue / shop.TotalOrders, 2) : 0,
+                        AverageTicket = avgCheck > 0 ? Math.Round(avgCheck, 2) : 0,
                         AverageWaitTimeMinutes = Math.Round(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes, 1),
                         TopDishName = topDish != null ? $"{topDish.Name} ({topDish.SalesCount} шт)" : "Немає даних",
                         WorstDishName = worstDish != null ? $"{worstDish.Name} ({worstDish.SalesCount} шт)" : "Немає даних",
-                        FixedCosts = shop.BaseRent + shop.StaffsDailySalary,
-                        BreakEvenProgress = (shop.BaseRent + shop.StaffsDailySalary) > 0 ? Math.Min((double)(shop.Revenue / (shop.BaseRent + shop.StaffsDailySalary)) * 100, 100): 100,
+
+                        FixedCosts = fixedCosts,
+                        BreakEvenProgress = fixedCosts > 0 ? Math.Min((double)(shop.Revenue / fixedCosts) * 100, 100) : 100,
+                        EstimatedPayoff = payoffForecast,
+
                         MenuStats = shop.Menu.Select(p => new ProductStatsDto
                         {
                             ShopName = shop.Name,
@@ -88,18 +110,40 @@ namespace coursework.Services
             {
                 foreach (var shop in zone.Shops)
                 {
+                    decimal fixedCosts = shop.BaseRent + shop.StaffsDailySalary;
+                    decimal remainingCosts = fixedCosts - shop.Revenue;
+                    decimal avgCheck = shop.TotalOrders > 0 ? shop.Revenue / shop.TotalOrders : 0;
+
+                    string payoffForecast;
+                    if (remainingCosts <= 0)
+                    {
+                        payoffForecast = "✅ Приносить чистий прибуток";
+                    }
+                    else if (avgCheck > 0)
+                    {
+                        int clientsNeeded = (int)Math.Ceiling(remainingCosts / avgCheck);
+                        payoffForecast = $"⏳ Ще ~{clientsNeeded} замовлень";
+                    }
+                    else
+                    {
+                        payoffForecast = "⚠️ Чекаємо першого клієнта";
+                    }
+
                     dtos.Add(new ShopStateDto
                     {
-                        ShopId = shop.Id,                        
-                        ShopName = shop.Name,                    
-                        CurrentRevenue = shop.Revenue,           
-                        CurrentQueue = shop.CurrentQueue,        
-                        CongestionLevel = Math.Round(shop.CongestionLevel, 2),       
+                        ShopId = shop.Id,
+                        ShopName = shop.Name,
+                        CurrentRevenue = shop.Revenue,
+                        CurrentQueue = shop.CurrentQueue,
+                        CongestionLevel = Math.Round(shop.CongestionLevel, 2),
                         Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
                         CashiersCount = shop.CashiersCount,
                         CooksCount = shop.CooksCount,
-                        FixedCosts = shop.BaseRent + shop.StaffsDailySalary,
-                        BreakEvenProgress = (shop.BaseRent + shop.StaffsDailySalary) > 0 ? Math.Min((double)(shop.Revenue / (shop.BaseRent + shop.StaffsDailySalary)) * 100, 100): 100,
+
+                        FixedCosts = fixedCosts,
+                        BreakEvenProgress = fixedCosts > 0 ? Math.Min((double)(shop.Revenue / fixedCosts) * 100, 100) : 100,
+                        EstimatedPayoff = payoffForecast,
+
                         MenuStats = shop.Menu.Select(p => new ProductStatsDto
                         {
                             ShopName = shop.Name,
