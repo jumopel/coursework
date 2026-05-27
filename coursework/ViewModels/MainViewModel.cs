@@ -32,6 +32,7 @@ namespace coursework.ViewModels
         public ICommand OpenMenuCommand { get; }
         public ICommand SaveMapCommand { get; }
         public ICommand LoadMapCommand { get; }
+        public ICommand OpenABTestCommand { get; }
         public System.Windows.Input.ICommand ImportCsvAndAnalyzeCommand { get; }
         public System.Windows.Input.ICommand OpenAnalyticsCommand { get; }
 
@@ -139,6 +140,10 @@ namespace coursework.ViewModels
             ImportCsvAndAnalyzeCommand = new coursework.Commands.RelayCommand(_ => ImportCsvAndAnalyze());
             ImportApiCommand = new coursework.Commands.RelayCommand(_ => ImportFromApi());
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
+            OpenABTestCommand = new RelayCommand(_ => {
+                var win = new coursework.Views.ABTestWindow { DataContext = new ABTestViewModel() };
+                win.ShowDialog();
+            });
             UpdateSnapshot();
         }
 

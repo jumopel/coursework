@@ -21,6 +21,8 @@ namespace coursework.ViewModels
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
         public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
         public System.Windows.Input.ICommand OpenFinancialPlanCommand { get; }
+        public SeriesCollection LoadHeatmapChart { get; set; } = new SeriesCollection();
+        public List<string> TimeLabels { get; set; } = new List<string> { "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00" };
         public System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage> BusinessAlerts { get; set; }
 
         private readonly coursework.Services.ExportService _exportService;
@@ -49,7 +51,8 @@ namespace coursework.ViewModels
             var snapshot = _dataProvider.GetZonesSnapshot();
             var analyzer = new coursework.Services.BusinessAnalyzerService();
             BusinessAlerts = new System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage>(analyzer.Analyze(snapshot));
-            GenerateCharts();   
+            GenerateCharts();
+            GenerateLoadHeatmap(snapshot);
         }
 
         public void GenerateCharts()
@@ -85,6 +88,32 @@ namespace coursework.ViewModels
             };
 
             TopShopsLabels = topShops.Select(s => s.ShopName).ToList();
+        }
+        private void GenerateLoadHeatmap(IEnumerable<ZoneStateDto> snapshot)
+        {
+            double baseLoad = snapshot.Sum(z => z.CurrentVisitors);
+            if (baseLoad == 0) baseLoad = 150; 
+
+            var values = new ChartValues<double>
+    {
+        baseLoad * 0.3,  
+        baseLoad * 0.8,  
+        baseLoad * 1.5,  
+        baseLoad * 0.9,  
+        baseLoad * 1.8,  
+        baseLoad * 2.2,  
+        baseLoad * 0.5   
+    };
+
+            LoadHeatmapChart.Add(new LineSeries
+            {
+                Title = "Очікуване навантаження (людей)",
+                Values = values,
+                PointGeometrySize = 10,
+                Stroke = System.Windows.Media.Brushes.Tomato,
+                Fill = System.Windows.Media.Brushes.Transparent,
+                LineSmoothness = 0.5 
+            });
         }
     }
 }
