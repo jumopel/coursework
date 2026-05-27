@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using coursework.Core;
+using coursework.DTO;
+using DocumentFormat.OpenXml.Office2013.WebExtension;
 using LiveCharts;
 using LiveCharts.Wpf;
-using coursework.Core;
-using coursework.DTO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace coursework.ViewModels
 {
@@ -19,6 +20,7 @@ namespace coursework.ViewModels
         public int TotalVisitors { get; set; }
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
         public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
+        public System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage> BusinessAlerts { get; set; }
 
         private readonly coursework.Services.ExportService _exportService;
         public AnalyticsViewModel(IFestivalDataProvider dataProvider)
@@ -37,6 +39,9 @@ namespace coursework.ViewModels
                 var win = new coursework.Views.AbcAnalysisWindow { DataContext = vm };
                 win.ShowDialog();
             });
+            var snapshot = _dataProvider.GetZonesSnapshot();
+            var analyzer = new coursework.Services.BusinessAnalyzerService();
+            BusinessAlerts = new System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage>(analyzer.Analyze(snapshot));
             GenerateCharts();   
         }
 
