@@ -1,0 +1,34 @@
+<Window x:Class="coursework.Views.AbcAnalysisWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ABC-Аналіз Меню" Height="500" Width="850"
+        WindowStartupLocation="CenterOwner" Background="#F4F6F9">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="ABC-Аналіз ефективності страв" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding AbcItems}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="White" RowHeight="35">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Заклад" Binding="{Binding ShopName}" Width="*"/>
+                <DataGridTextColumn Header="Страва" Binding="{Binding ProductName}" Width="1.5*"/>
+                <DataGridTextColumn Header="Продано (шт)" Binding="{Binding SalesCount}" Width="Auto"/>
+                <DataGridTextColumn Header="Виручка (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
+                <DataGridTextColumn Header="Накопичено %" Binding="{Binding CumulativePercentage}" Width="Auto"/>
+
+                <DataGridTemplateColumn Header="Клас (ABC)" Width="140">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding CategoryColor}" CornerRadius="5" Padding="5,2" Margin="2">
+                                <TextBlock Text="{Binding Category}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

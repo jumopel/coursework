@@ -11,7 +11,6 @@ namespace coursework.DTO
         private decimal _currentRevenue;
         private int _cashiersCount;
         private int _cooksCount;
-
         public string ShopName { get; set; } = string.Empty;
         public Guid ShopId { get; set; }
         public int CurrentQueue { get => _currentQueue; set => SetProperty(ref _currentQueue, value); }
@@ -27,5 +26,6 @@ namespace coursework.DTO
         public double AverageWaitTimeMinutes { get; set; }
         public string TopDishName { get; set; }
         public string WorstDishName { get; set; }
+        public System.Collections.Generic.List<ProductStatsDto> MenuStats { get; set; } = new System.Collections.Generic.List<ProductStatsDto>();
     }
 }

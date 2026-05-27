@@ -18,6 +18,8 @@ namespace coursework.ViewModels
         public decimal TotalRevenue { get; set; }
         public int TotalVisitors { get; set; }
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
+        public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
+
         private readonly coursework.Services.ExportService _exportService;
         public AnalyticsViewModel(IFestivalDataProvider dataProvider)
         {
@@ -27,6 +29,13 @@ namespace coursework.ViewModels
             {
                 var snapshot = _dataProvider.GetZonesSnapshot();
                 _exportService.GenerateOverallReport(snapshot);
+            });
+            OpenAbcAnalysisCommand = new coursework.Commands.RelayCommand(_ =>
+            {
+                var snapshot = _dataProvider.GetZonesSnapshot();
+                var vm = new coursework.ViewModels.AbcAnalysisViewModel(snapshot);
+                var win = new coursework.Views.AbcAnalysisWindow { DataContext = vm };
+                win.ShowDialog();
             });
             GenerateCharts();   
         }

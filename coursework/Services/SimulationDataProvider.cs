@@ -56,14 +56,20 @@ namespace coursework.Services
                         Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
                         CashiersCount = shop.CashiersCount,
                         CooksCount = shop.CooksCount,
-
                         TotalExpenses = shop.BaseRent + shop.StaffsDailySalary,
                         NetProfit = shop.Revenue - (shop.BaseRent + shop.StaffsDailySalary),
                         TotalOrders = shop.TotalOrders,
                         AverageTicket = shop.TotalOrders > 0 ? Math.Round(shop.Revenue / shop.TotalOrders, 2) : 0,
                         AverageWaitTimeMinutes = Math.Round(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes, 1),
                         TopDishName = topDish != null ? $"{topDish.Name} ({topDish.SalesCount} шт)" : "Немає даних",
-                        WorstDishName = worstDish != null ? $"{worstDish.Name} ({worstDish.SalesCount} шт)" : "Немає даних"
+                        WorstDishName = worstDish != null ? $"{worstDish.Name} ({worstDish.SalesCount} шт)" : "Немає даних",
+                        MenuStats = shop.Menu.Select(p => new ProductStatsDto
+                        {
+                            ShopName = shop.Name,
+                            ProductName = p.Name,
+                            Price = p.Price,
+                            SalesCount = p.SalesCount
+                        }).ToList()
                     });
                 }
 
@@ -89,7 +95,13 @@ namespace coursework.Services
                         Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
                         CashiersCount = shop.CashiersCount,
                         CooksCount = shop.CooksCount,
-
+                        MenuStats = shop.Menu.Select(p => new ProductStatsDto
+                        {
+                            ShopName = shop.Name,
+                            ProductName = p.Name,
+                            Price = p.Price,
+                            SalesCount = p.SalesCount
+                        }).ToList()
                     });
                 }
             }

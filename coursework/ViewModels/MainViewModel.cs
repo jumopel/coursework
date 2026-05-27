@@ -139,7 +139,6 @@ namespace coursework.ViewModels
             ImportCsvAndAnalyzeCommand = new coursework.Commands.RelayCommand(_ => ImportCsvAndAnalyze());
             ImportApiCommand = new coursework.Commands.RelayCommand(_ => ImportFromApi());
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
-            InitializeDemoData();
             UpdateSnapshot();
         }
 
@@ -200,55 +199,6 @@ namespace coursework.ViewModels
         }
 
 
-        private void InitializeDemoData()
-        {
-            var foodZone = new BaseZone
-            {
-                Name = "Центральний Фуд-Корт",
-                Theme = "Американська та Італійська кухня",
-                Capacity = 120,
-                Width = 400,
-                Height = 250,
-                X = 30,
-                Y = 30,
-                ZoneCuisine = Models.CuisineType.Universal
-            };
-
-            var burgerShop = _dataService.CreateShop(
-                name: "Бургерна 'Краш'",
-                cashiers: 2,
-                cooks: 3,
-                rent: 600,
-                salary: 350,
-                orderTakingMinutes: 1.5,
-                prepMinutes: 4.0,
-                x: 150,
-                y: 200
-            );
-
-            _dataService.AddProductToShop(burgerShop, "Краш Бургер XXL", 145, 55, TimeSpan.FromMinutes(3), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.American);
-            _dataService.AddProductToShop(burgerShop, "Картопля Фрі", 65, 18, TimeSpan.FromMinutes(2), ProductCategory.Snack, DietaryType.Vegetarian, CuisineType.Universal);
-            _dataService.AddProductToShop(burgerShop, "Фірмовий Лимонад", 45, 12, TimeSpan.FromMinutes(0.5), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
-
-            var pizzaShop = _dataService.CreateShop(
-                name: "Піцерія 'Vicini'",
-                cashiers: 1,
-                cooks: 2,
-                rent: 900,
-                salary: 450,
-                orderTakingMinutes: 2.5,
-                prepMinutes: 8.0,
-                x: 400,
-                y: 200
-            );
-
-            _dataService.AddProductToShop(pizzaShop, "Піца Маргарита", 300, 85, TimeSpan.FromMinutes(6), ProductCategory.MainCourse, DietaryType.Vegetarian, CuisineType.Italian);
-            _dataService.AddProductToShop(pizzaShop, "Піца Пепероні", 340, 110, TimeSpan.FromMinutes(7), ProductCategory.MainCourse, DietaryType.Standard, CuisineType.Italian);
-            _dataService.AddProductToShop(pizzaShop, "Сік прямого віджиму", 100, 20, TimeSpan.FromMinutes(1), ProductCategory.Drink, DietaryType.Standard, CuisineType.Universal);
-            foodZone.AddShop(burgerShop);
-            foodZone.AddShop(pizzaShop);
-            _engine.Zones.Add(foodZone);
-        }
         private void HireStaff(coursework.DTO.ShopStateDto? dto, bool isCashier)
         {
             if (dto == null) return;
