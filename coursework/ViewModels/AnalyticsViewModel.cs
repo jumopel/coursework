@@ -15,8 +15,8 @@ namespace coursework.ViewModels
         public SeriesCollection RevenueByZoneChart { get; set; }
         public SeriesCollection TopShopsChart { get; set; }
         public List<string> TopShopsLabels { get; set; }
-
         public decimal TotalRevenue { get; set; }
+        public decimal TotalNetProfit => _dataProvider.GetZonesSnapshot().SelectMany(z => z.ShopsData).Sum(s => s.NetProfit);
         public int TotalVisitors { get; set; }
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
         public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
@@ -91,28 +91,23 @@ namespace coursework.ViewModels
         }
         private void GenerateLoadHeatmap(IEnumerable<ZoneStateDto> snapshot)
         {
-            double baseLoad = snapshot.Sum(z => z.CurrentVisitors);
-            if (baseLoad == 0) baseLoad = 150; 
-
-            var values = new ChartValues<double>
-    {
-        baseLoad * 0.3,  
-        baseLoad * 0.8,  
-        baseLoad * 1.5,  
-        baseLoad * 0.9,  
-        baseLoad * 1.8,  
-        baseLoad * 2.2,  
-        baseLoad * 0.5   
-    };
-
-            LoadHeatmapChart.Add(new LineSeries
+            LoadHeatmapChart.Clear();
+            TimeLabels.Clear();
+            var values = new ChartValues<double>();
+            foreach (var zone in snapshot)
             {
-                Title = "Очікуване навантаження (людей)",
+                int totalQueueInZone = zone.ShopsData.Sum(s => s.CurrentQueue);
+                values.Add(totalQueueInZone);
+                TimeLabels.Add(zone.ZoneName);
+            }
+
+            LoadHeatmapChart.Add(new ColumnSeries
+            {
+                Title = "Людей у чергах",
                 Values = values,
-                PointGeometrySize = 10,
-                Stroke = System.Windows.Media.Brushes.Tomato,
-                Fill = System.Windows.Media.Brushes.Transparent,
-                LineSmoothness = 0.5 
+                Fill = System.Windows.Media.Brushes.Tomato,
+                DataLabels = true, 
+                LabelPoint = point => point.Y.ToString()
             });
         }
     }

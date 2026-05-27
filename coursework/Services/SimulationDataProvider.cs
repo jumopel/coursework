@@ -70,6 +70,7 @@ namespace coursework.Services
                             ShopName = shop.Name,
                             ProductName = p.Name,
                             Price = p.Price,
+                            CostPrice = p.CostPrice, 
                             SalesCount = p.SalesCount
                         }).ToList()
                     });
@@ -104,6 +105,7 @@ namespace coursework.Services
                             ShopName = shop.Name,
                             ProductName = p.Name,
                             Price = p.Price,
+                            CostPrice = p.CostPrice, 
                             SalesCount = p.SalesCount
                         }).ToList()
                     });

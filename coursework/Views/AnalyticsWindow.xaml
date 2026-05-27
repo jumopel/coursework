@@ -62,6 +62,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="25,20">
@@ -69,8 +71,8 @@
                     <DropShadowEffect Color="Gray" BlurRadius="10" ShadowDepth="2" Opacity="0.15"/>
                 </Border.Effect>
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="ЗАГАЛЬНИЙ ПРИБУТОК ФЕСТИВАЛЮ" FontSize="13" Foreground="#7F8C8D" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding TotalRevenue, StringFormat={}{0:C0}}" FontSize="36" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                    <TextBlock Text="ЗАГАЛЬНА ВИРУЧКА" FontSize="13" Foreground="#7F8C8D" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding TotalRevenue, StringFormat={}{0:C0}}" FontSize="36" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
@@ -79,7 +81,17 @@
                     <DropShadowEffect Color="Gray" BlurRadius="10" ShadowDepth="2" Opacity="0.15"/>
                 </Border.Effect>
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="ВІДВІДУВАЧІВ НА ТЕРИТОРІЇ" FontSize="13" Foreground="#7F8C8D" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="ЧИСТИЙ ПРИБУТОК" FontSize="13" Foreground="#7F8C8D" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding TotalNetProfit, StringFormat={}{0:C0}}" FontSize="36" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Background="White" CornerRadius="10" Padding="25,20">
+                <Border.Effect>
+                    <DropShadowEffect Color="Gray" BlurRadius="10" ShadowDepth="2" Opacity="0.15"/>
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="ВІДВІДУВАЧІВ" FontSize="13" Foreground="#7F8C8D" FontWeight="Bold" Margin="0,0,0,10"/>
                     <TextBlock Text="{Binding TotalVisitors}" FontSize="36" FontWeight="Bold" Foreground="#2980B9" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>

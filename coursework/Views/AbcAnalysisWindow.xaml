@@ -16,7 +16,7 @@
                 <DataGridTextColumn Header="Заклад" Binding="{Binding ShopName}" Width="*"/>
                 <DataGridTextColumn Header="Страва" Binding="{Binding ProductName}" Width="1.5*"/>
                 <DataGridTextColumn Header="Продано (шт)" Binding="{Binding SalesCount}" Width="Auto"/>
-                <DataGridTextColumn Header="Виручка (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
+                <DataGridTextColumn Header="Чистий прибуток (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
                 <DataGridTextColumn Header="Накопичено %" Binding="{Binding CumulativePercentage}" Width="Auto"/>
 
                 <DataGridTemplateColumn Header="Клас (ABC)" Width="140">

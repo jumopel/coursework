@@ -25,44 +25,29 @@ namespace coursework.ViewModels
             var allProducts = zones.SelectMany(z => z.ShopsData)
                                    .SelectMany(s => s.MenuStats)
                                    .Where(p => p.SalesCount > 0)
-                                   .OrderByDescending(p => p.TotalRevenue)
+                                   .OrderByDescending(p => p.TotalProfit)
                                    .ToList();
 
-            decimal totalFestivalRevenue = allProducts.Sum(p => p.TotalRevenue);
-            decimal cumulativeRevenue = 0;
+            decimal totalFestivalProfit = allProducts.Sum(p => p.TotalProfit);
+            decimal cumulativeProfit = 0;
             AbcItems = new List<AbcItem>();
 
             foreach (var p in allProducts)
             {
-                cumulativeRevenue += p.TotalRevenue;
-                double cumulativePercent = totalFestivalRevenue > 0
-                    ? (double)(cumulativeRevenue / totalFestivalRevenue) * 100
+                cumulativeProfit += p.TotalProfit;
+                double cumulativePercent = totalFestivalProfit > 0
+                    ? (double)(cumulativeProfit / totalFestivalProfit) * 100
                     : 0;
 
-                string category, color;
-
-                if (cumulativePercent <= 80)
-                {
-                    category = "A (Флагман)";
-                    color = "#27AE60"; 
-                }
-                else if (cumulativePercent <= 95)
-                {
-                    category = "B (Середняк)";
-                    color = "#F39C12"; 
-                }
-                else
-                {
-                    category = "C (Аутсайдер)";
-                    color = "#E74C3C"; 
-                }
+                string category = cumulativePercent <= 80 ? "A (Флагман)" : cumulativePercent <= 95 ? "B (Середняк)" : "C (Аутсайдер)";
+                string color = cumulativePercent <= 80 ? "#27AE60" : cumulativePercent <= 95 ? "#F39C12" : "#E74C3C";
 
                 AbcItems.Add(new AbcItem
                 {
                     ShopName = p.ShopName,
                     ProductName = p.ProductName,
                     SalesCount = p.SalesCount,
-                    TotalRevenue = p.TotalRevenue,
+                    TotalRevenue = Math.Round(p.TotalProfit, 2), 
                     CumulativePercentage = Math.Round(cumulativePercent, 1),
                     Category = category,
                     CategoryColor = color
