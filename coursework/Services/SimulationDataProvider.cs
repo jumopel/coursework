@@ -63,6 +63,8 @@ namespace coursework.Services
                         AverageWaitTimeMinutes = Math.Round(shop.OrderTakingTime.TotalMinutes + shop.FoodPreparationTime.TotalMinutes, 1),
                         TopDishName = topDish != null ? $"{topDish.Name} ({topDish.SalesCount} шт)" : "Немає даних",
                         WorstDishName = worstDish != null ? $"{worstDish.Name} ({worstDish.SalesCount} шт)" : "Немає даних",
+                        FixedCosts = shop.BaseRent + shop.StaffsDailySalary,
+                        BreakEvenProgress = (shop.BaseRent + shop.StaffsDailySalary) > 0 ? Math.Min((double)(shop.Revenue / (shop.BaseRent + shop.StaffsDailySalary)) * 100, 100): 100,
                         MenuStats = shop.Menu.Select(p => new ProductStatsDto
                         {
                             ShopName = shop.Name,
@@ -95,6 +97,8 @@ namespace coursework.Services
                         Attractiveness = Math.Round(shop.CurrentAttractiveness, 2),
                         CashiersCount = shop.CashiersCount,
                         CooksCount = shop.CooksCount,
+                        FixedCosts = shop.BaseRent + shop.StaffsDailySalary,
+                        BreakEvenProgress = (shop.BaseRent + shop.StaffsDailySalary) > 0 ? Math.Min((double)(shop.Revenue / (shop.BaseRent + shop.StaffsDailySalary)) * 100, 100): 100,
                         MenuStats = shop.Menu.Select(p => new ProductStatsDto
                         {
                             ShopName = shop.Name,

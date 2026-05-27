@@ -24,7 +24,13 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-
+                <Button Content="💰 План окупності" Command="{Binding OpenFinancialPlanCommand}" 
+        Height="42" Padding="20,0" Margin="0,0,12,0" Cursor="Hand"
+        Background="#2980B9" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0">
+                    <Button.Effect>
+                        <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="1" Opacity="0.2"/>
+                    </Button.Effect>
+                </Button>
                 <Button Content="📊 ABC-Аналіз Меню" Command="{Binding OpenAbcAnalysisCommand}" 
                         Height="42" Padding="20,0" Margin="0,0,12,0" Cursor="Hand"
                         Background="#8E44AD" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0">

@@ -26,6 +26,10 @@ namespace coursework.DTO
         public double AverageWaitTimeMinutes { get; set; }
         public string TopDishName { get; set; }
         public string WorstDishName { get; set; }
+        public decimal FixedCosts { get; set; } 
+        public double BreakEvenProgress { get; set; } 
+        public string BreakEvenStatus => BreakEvenProgress >= 100 ? "Окупився" : "В мінусі";
+        public string ProgressColor => BreakEvenProgress >= 100 ? "#27AE60" : "#E74C3C";
         public System.Collections.Generic.List<ProductStatsDto> MenuStats { get; set; } = new System.Collections.Generic.List<ProductStatsDto>();
     }
 }

@@ -20,6 +20,7 @@ namespace coursework.ViewModels
         public int TotalVisitors { get; set; }
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
         public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
+        public System.Windows.Input.ICommand OpenFinancialPlanCommand { get; }
         public System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage> BusinessAlerts { get; set; }
 
         private readonly coursework.Services.ExportService _exportService;
@@ -37,6 +38,12 @@ namespace coursework.ViewModels
                 var snapshot = _dataProvider.GetZonesSnapshot();
                 var vm = new coursework.ViewModels.AbcAnalysisViewModel(snapshot);
                 var win = new coursework.Views.AbcAnalysisWindow { DataContext = vm };
+                win.ShowDialog();
+            });
+            OpenFinancialPlanCommand = new coursework.Commands.RelayCommand(_ =>
+            {
+                var snapshot = _dataProvider.GetShopsSnapshot();
+                var win = new coursework.Views.FinancialPlanWindow(snapshot);
                 win.ShowDialog();
             });
             var snapshot = _dataProvider.GetZonesSnapshot();
