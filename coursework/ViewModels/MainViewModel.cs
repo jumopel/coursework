@@ -32,6 +32,7 @@ namespace coursework.ViewModels
         public ICommand OpenMenuCommand { get; }
         public ICommand SaveMapCommand { get; }
         public ICommand LoadMapCommand { get; }
+        public System.Windows.Input.ICommand ImportCsvAndAnalyzeCommand { get; }
         public System.Windows.Input.ICommand OpenAnalyticsCommand { get; }
 
         public string ElapsedTimeText
@@ -57,6 +58,7 @@ namespace coursework.ViewModels
         public ICommand SetSpeed1XCommand { get; }
         public ICommand SetSpeed2XCommand { get; }
         public ICommand SetSpeed4XCommand { get; }
+        public System.Windows.Input.ICommand ImportApiCommand { get; }
 
         public MainViewModel()
         {
@@ -134,6 +136,8 @@ namespace coursework.ViewModels
             });
             OpenAnalyticsCommand = new coursework.Commands.RelayCommand(_ => OpenAnalytics());
             DeleteZoneCommand = new RelayCommand(param => DeleteZone(param as coursework.DTO.ZoneStateDto));
+            ImportCsvAndAnalyzeCommand = new coursework.Commands.RelayCommand(_ => ImportCsvAndAnalyze());
+            ImportApiCommand = new coursework.Commands.RelayCommand(_ => ImportFromApi());
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
             InitializeDemoData();
             UpdateSnapshot();
@@ -325,6 +329,47 @@ namespace coursework.ViewModels
                 Owner = System.Windows.Application.Current.MainWindow
             };
             window.ShowDialog();
+        }
+        private void ImportCsvAndAnalyze()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Імпорт касового звіту",
+                Filter = "CSV Files (*.csv)|*.csv",
+                DefaultExt = ".csv"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                var csvProvider = new coursework.Services.CsvDataProvider(dialog.FileName);
+
+                var analyticsVm = new AnalyticsViewModel(csvProvider);
+                var window = new coursework.Views.AnalyticsWindow
+                {
+                    DataContext = analyticsVm,
+                    Owner = System.Windows.Application.Current.MainWindow
+                };
+                window.ShowDialog();
+            }
+        }
+        private async void ImportFromApi()
+        {
+            string apiUrl = "https://api.gastro-metric.com/v1/festival/live-stats";// недійсний URL, замініть на реальний
+
+            var apiProvider = new coursework.Services.ApiDataProvider(apiUrl);
+
+            await apiProvider.LoadDataFromApiAsync();
+
+            if (apiProvider.GetZonesSnapshot().Any())
+            {
+                var analyticsVm = new AnalyticsViewModel(apiProvider);
+                var window = new coursework.Views.AnalyticsWindow
+                {
+                    DataContext = analyticsVm,
+                    Owner = System.Windows.Application.Current.MainWindow
+                };
+                window.ShowDialog();
+            }
         }
     }
 }
