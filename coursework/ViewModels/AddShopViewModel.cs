@@ -43,6 +43,7 @@ namespace coursework.ViewModels
                 CooksCount = Cooks,
                 BaseRent = Rent,
                 StaffsDailySalary = Salary,
+                OrderTakingTime = TimeSpan.FromMinutes(1.5)
             };
 
             ShopCreated?.Invoke(newShop);

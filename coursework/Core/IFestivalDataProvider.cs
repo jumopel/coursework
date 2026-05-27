@@ -5,7 +5,7 @@ using System.Text;
 
 namespace coursework.Core
 {
-    internal interface IFestivalDataProvider
+    public interface IFestivalDataProvider
     {
         string ProviderName { get; }
         IEnumerable<ZoneStateDto> GetZonesSnapshot();

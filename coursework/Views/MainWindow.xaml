@@ -63,6 +63,7 @@
                     <Button Content="➕ Додати зону" Command="{Binding OpenAddZoneCommand}" Width="130" Height="35" Margin="0,0,10,0" Background="#8E44AD" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                     <Button Content="➕ Додати заклад" Command="{Binding OpenAddShopCommand}" Width="140" Height="35" Margin="0,0,10,0" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                     <Button Content="🗺 Карта фестивалю" Command="{Binding OpenMapCommand}" Width="150" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                    <Button Content="📊 Аналітика" Command="{Binding OpenAnalyticsCommand}"  Width="150" Height="35"  Background="#F39C12" Foreground="White" FontWeight="Bold" BorderThickness="0" RenderTransformOrigin="0.514,0.661"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -76,7 +77,6 @@
                 <DataGridTextColumn Header="Назва Зони" Binding="{Binding ZoneName}" Width="2*"/>
                 <DataGridTextColumn Header="Тематика" Binding="{Binding Theme}" Width="2*"/>
                 <DataGridTextColumn Header="Людей" Binding="{Binding CurrentVisitors}" Width="Auto"/>
-                <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
                 <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>
                 <DataGridTextColumn Header="Завантаженість (%)" Binding="{Binding OccupancyRate}" Width="Auto"/>
                 <DataGridTextColumn Header="Прибуток зони (грн)" Binding="{Binding TotalRevenue}" Width="Auto"/>

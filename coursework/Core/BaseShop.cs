@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 
 namespace coursework.Core
@@ -64,8 +65,13 @@ namespace coursework.Core
         public Models.CuisineType ShopCuisine { get; set; } = Models.CuisineType.Universal;
         public TimeSpan FoodPreparationTime
         {
-            get => _foodPreparationTime;
-            set => SetProperty(ref _foodPreparationTime, value);
+            get
+            {
+                if (Menu == null || Menu.Count == 0)
+                    return TimeSpan.FromMinutes(2);
+                double avgMinutes = Menu.Average(p => p.PreparationTime.TotalMinutes);
+                return TimeSpan.FromMinutes(avgMinutes);
+            }
         }
         public TimeSpan OrderTakingTime
         {

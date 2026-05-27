@@ -35,8 +35,6 @@ namespace coursework.Services
             shop.BaseRent = rent;
             shop.StaffsDailySalary = salary;
             shop.OrderTakingTime = TimeSpan.FromMinutes(orderTakingMinutes);
-            shop.FoodPreparationTime = TimeSpan.FromMinutes(prepMinutes);
-
             return shop;
         }
         public void AddProductToShop(BaseShop shop, string name, decimal price, decimal cost,

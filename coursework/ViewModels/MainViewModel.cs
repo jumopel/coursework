@@ -32,6 +32,7 @@ namespace coursework.ViewModels
         public ICommand OpenMenuCommand { get; }
         public ICommand SaveMapCommand { get; }
         public ICommand LoadMapCommand { get; }
+        public System.Windows.Input.ICommand OpenAnalyticsCommand { get; }
 
         public string ElapsedTimeText
         {
@@ -131,7 +132,7 @@ namespace coursework.ViewModels
 
                 window.ShowDialog(); 
             });
-
+            OpenAnalyticsCommand = new coursework.Commands.RelayCommand(_ => OpenAnalytics());
             DeleteZoneCommand = new RelayCommand(param => DeleteZone(param as coursework.DTO.ZoneStateDto));
             _dataProvider.DataUpdated += OnSimulationDataUpdated;
             InitializeDemoData();
@@ -313,6 +314,17 @@ namespace coursework.ViewModels
                 System.Windows.MessageBox.Show("Карту успішно завантажено! Можете відкривати редактор.", "Успіх", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
         }
+        private void OpenAnalytics()
+        {
+            UpdateSnapshot();
 
+            var analyticsVm = new AnalyticsViewModel(_dataProvider);
+            var window = new coursework.Views.AnalyticsWindow
+            {
+                DataContext = analyticsVm,
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+            window.ShowDialog();
+        }
     }
 }
