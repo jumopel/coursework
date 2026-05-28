@@ -34,10 +34,21 @@ namespace coursework.Views
         {
             var freshData = _dataProvider.GetShopsSnapshot();
 
-            ShopsData.Clear();
-            foreach (var shop in freshData)
+            foreach (var freshShop in freshData)
             {
-                ShopsData.Add(shop);
+                var existingShop = ShopsData.FirstOrDefault(s => s.ShopId == freshShop.ShopId);
+
+                if (existingShop != null)
+                {
+                    existingShop.CurrentRevenue = freshShop.CurrentRevenue;
+                    existingShop.FixedCosts = freshShop.FixedCosts;
+                    existingShop.EstimatedPayoff = freshShop.EstimatedPayoff;
+                    existingShop.BreakEvenProgress = freshShop.BreakEvenProgress;
+                }
+                else
+                {
+                    ShopsData.Add(freshShop);
+                }
             }
         }
     }
