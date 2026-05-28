@@ -14,7 +14,8 @@ namespace coursework.Services
         {
             WriteIndented = true,
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
         };
 
         public void SaveMapToFile(ObservableCollection<BaseZone> zones)

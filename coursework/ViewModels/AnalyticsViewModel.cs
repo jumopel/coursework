@@ -5,6 +5,7 @@ using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Threading;
 
 namespace coursework.ViewModels
 {
@@ -12,6 +13,7 @@ namespace coursework.ViewModels
     {
         private readonly IFestivalDataProvider _dataProvider;
         private readonly coursework.Services.ExportService _exportService;
+        private readonly DispatcherTimer _timer;
 
         public SeriesCollection ZoneComparisonChart { get; set; } = new SeriesCollection();
         public List<string> ZoneLabels { get; set; } = new List<string>();
@@ -21,25 +23,29 @@ namespace coursework.ViewModels
 
         private List<string> _topShopsLabels = new List<string>();
         public List<string> TopShopsLabels { get => _topShopsLabels; set => SetProperty(ref _topShopsLabels, value); }
-        public SeriesCollection LoadHeatmapChart { get; set; } = new SeriesCollection();
-        public List<string> TimeLabels { get; set; } = new List<string>();
+
+        public SeriesCollection ProfitTrendChart { get; set; }
+        public ChartValues<decimal> ProfitHistory { get; set; } = new ChartValues<decimal>();
+
+        private List<string> _trendTimeLabels = new List<string>();
+        public List<string> TrendTimeLabels { get => _trendTimeLabels; set => SetProperty(ref _trendTimeLabels, value); }
 
         public Func<double, string> Formatter { get; set; } = value => value.ToString("C0");
-
-        public decimal TotalNetProfit => _dataProvider.GetZonesSnapshot().SelectMany(z => z.ShopsData).Sum(s => s.NetProfit);
 
         private decimal _totalRevenue;
         public decimal TotalRevenue { get => _totalRevenue; set => SetProperty(ref _totalRevenue, value); }
 
+        public decimal TotalNetProfit => _dataProvider.GetZonesSnapshot().SelectMany(z => z.ShopsData).Sum(s => s.NetProfit);
+
         private int _totalVisitors;
         public int TotalVisitors { get => _totalVisitors; set => SetProperty(ref _totalVisitors, value); }
-
         private System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage> _businessAlerts;
         public System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage> BusinessAlerts
         {
             get => _businessAlerts;
             set => SetProperty(ref _businessAlerts, value);
         }
+
         public System.Windows.Input.ICommand ExportOverallReportCommand { get; }
         public System.Windows.Input.ICommand OpenAbcAnalysisCommand { get; }
         public System.Windows.Input.ICommand OpenFinancialPlanCommand { get; }
@@ -60,7 +66,6 @@ namespace coursework.ViewModels
                 var vm = new coursework.ViewModels.AbcAnalysisViewModel(_dataProvider);
                 var win = new coursework.Views.AbcAnalysisWindow { DataContext = vm };
                 win.Closed += (s, args) => vm.StopTimer();
-
                 win.ShowDialog();
             });
 
@@ -70,31 +75,44 @@ namespace coursework.ViewModels
                 win.ShowDialog();
             });
 
-            var snapshot = _dataProvider.GetZonesSnapshot().ToList();
+            ProfitTrendChart = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = "Чистий прибуток",
+                    Values = ProfitHistory,
+                    PointGeometrySize = 10,
+                    LineSmoothness = 0.4, 
+                    StrokeThickness = 3,
+                    Stroke = System.Windows.Media.Brushes.MediumSeaGreen,
+                    Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 60, 179, 113)), // Напівпрозорий зелений фон під лінією
+                    DataLabels = true,
+                    LabelPoint = point => point.Y.ToString("C0")
+                }
+            };
 
+            var snapshot = _dataProvider.GetZonesSnapshot().ToList();
             GenerateZoneComparison(snapshot);
-            GenerateLoadHeatmap(snapshot);
             GenerateCharts(snapshot);
+            UpdateTrendChart(snapshot); 
 
             var analyzer = new coursework.Services.BusinessAnalyzerService();
             BusinessAlerts = new System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage>(analyzer.Analyze(snapshot));
 
-            var timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(2); 
-            timer.Tick += (s, e) =>
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Tick += (s, e) =>
             {
                 var snap = _dataProvider.GetZonesSnapshot().ToList();
 
                 GenerateZoneComparison(snap);
-                GenerateLoadHeatmap(snap);
-                GenerateCharts(snap); 
+                GenerateCharts(snap);
+                UpdateTrendChart(snap); 
 
-                var analyzer = new coursework.Services.BusinessAnalyzerService();
                 BusinessAlerts = new System.Collections.ObjectModel.ObservableCollection<coursework.DTO.AlertMessage>(analyzer.Analyze(snap));
-
                 OnPropertyChanged(nameof(TotalNetProfit));
             };
-            timer.Start();
+            _timer.Start();
         }
 
         private void GenerateCharts(List<ZoneStateDto> zonesSnapshot)
@@ -119,27 +137,23 @@ namespace coursework.ViewModels
             TopShopsLabels = topShops.Select(s => s.ShopName).ToList();
         }
 
-        private void GenerateLoadHeatmap(IEnumerable<ZoneStateDto> snapshot)
+        private void UpdateTrendChart(List<ZoneStateDto> snapshot)
         {
-            LoadHeatmapChart.Clear();
-            TimeLabels.Clear();
-            var values = new ChartValues<double>();
+            decimal currentProfit = snapshot.SelectMany(z => z.ShopsData).Sum(s => s.NetProfit);
+            string currentTime = DateTime.Now.ToString("HH:mm:ss");
 
-            foreach (var zone in snapshot)
+            ProfitHistory.Add(currentProfit);
+
+            var newLabels = new List<string>(TrendTimeLabels);
+            newLabels.Add(currentTime);
+
+            if (ProfitHistory.Count > 60)
             {
-                int totalQueueInZone = zone.ShopsData.Sum(s => s.CurrentQueue);
-                values.Add(totalQueueInZone);
-                TimeLabels.Add(zone.ZoneName);
+                ProfitHistory.RemoveAt(0);
+                newLabels.RemoveAt(0);
             }
 
-            LoadHeatmapChart.Add(new ColumnSeries
-            {
-                Title = "Людей у чергах",
-                Values = values,
-                Fill = System.Windows.Media.Brushes.Tomato,
-                DataLabels = true,
-                LabelPoint = point => point.Y.ToString()
-            });
+            TrendTimeLabels = newLabels; 
         }
 
         private void GenerateZoneComparison(IEnumerable<ZoneStateDto> snapshot)
@@ -154,7 +168,6 @@ namespace coursework.ViewModels
             foreach (var zone in snapshot)
             {
                 ZoneLabels.Add(zone.ZoneName);
-
                 double rev = (double)zone.ShopsData.Sum(s => s.CurrentRevenue);
                 double prof = (double)zone.ShopsData.Sum(s => s.NetProfit);
                 double exp = rev - prof;
