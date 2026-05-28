@@ -57,9 +57,10 @@ namespace coursework.ViewModels
 
             OpenAbcAnalysisCommand = new coursework.Commands.RelayCommand(_ =>
             {
-                var snap = _dataProvider.GetZonesSnapshot();
-                var vm = new coursework.ViewModels.AbcAnalysisViewModel(snap);
+                var vm = new coursework.ViewModels.AbcAnalysisViewModel(_dataProvider);
                 var win = new coursework.Views.AbcAnalysisWindow { DataContext = vm };
+                win.Closed += (s, args) => vm.StopTimer();
+
                 win.ShowDialog();
             });
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Linq;
 using System.Windows.Threading;
 using coursework.Core;
 using coursework.DTO;
@@ -36,7 +37,7 @@ namespace coursework.Views
 
             foreach (var freshShop in freshData)
             {
-                var existingShop = ShopsData.FirstOrDefault(s => s.ShopId == freshShop.ShopId);
+                var existingShop = ShopsData.FirstOrDefault(s => s.ShopName == freshShop.ShopName);
 
                 if (existingShop != null)
                 {

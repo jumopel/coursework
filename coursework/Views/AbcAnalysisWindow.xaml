@@ -11,7 +11,7 @@
 
         <TextBlock Text="ABC-Аналіз ефективності страв" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" HorizontalAlignment="Center"/>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding AbcItems}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="White" RowHeight="35">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding AbcItems}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="White" RowHeight="35" EnableRowVirtualization="False" VirtualizingPanel.IsVirtualizing="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Заклад" Binding="{Binding ShopName}" Width="*"/>
                 <DataGridTextColumn Header="Страва" Binding="{Binding ProductName}" Width="1.5*"/>

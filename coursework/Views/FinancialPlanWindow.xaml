@@ -19,8 +19,17 @@
                 <DropShadowEffect Color="Gray" BlurRadius="5" Opacity="0.1"/>
             </Border.Effect>
 
-            <DataGrid ItemsSource="{Binding ShopsData}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="White" RowHeight="45" BorderThickness="0" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EAECEE">
-
+            <DataGrid ItemsSource="{Binding ShopsData}" 
+          AutoGenerateColumns="False" 
+          CanUserAddRows="False" 
+          IsReadOnly="True" 
+          Background="White" 
+          RowHeight="45" 
+          BorderThickness="0" 
+          GridLinesVisibility="Horizontal" 
+          HorizontalGridLinesBrush="#EAECEE"
+          EnableRowVirtualization="False" 
+          VirtualizingPanel.IsVirtualizing="False">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="FontWeight" Value="Bold"/>

@@ -1,27 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using coursework.Core;
 using coursework.DTO;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Threading;
 
 namespace coursework.ViewModels
 {
     public class AbcItem
     {
-        public string ShopName { get; set; }
-        public string ProductName { get; set; }
+        public string ShopName { get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
         public int SalesCount { get; set; }
         public decimal TotalRevenue { get; set; }
         public double CumulativePercentage { get; set; }
-        public string Category { get; set; }
-        public string CategoryColor { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public string CategoryColor { get; set; } = string.Empty;
     }
 
-    public class AbcAnalysisViewModel
+    public class AbcAnalysisViewModel : ObservableObject
     {
-        public List<AbcItem> AbcItems { get; set; }
+        private readonly IFestivalDataProvider _dataProvider;
+        private readonly DispatcherTimer _timer;
 
-        public AbcAnalysisViewModel(IEnumerable<ZoneStateDto> zones)
+        public ObservableCollection<AbcItem> AbcItems { get; set; }
+
+        public AbcAnalysisViewModel(IFestivalDataProvider dataProvider)
         {
+            _dataProvider = dataProvider;
+            AbcItems = new ObservableCollection<AbcItem>();
+
+            UpdateData();
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(5);
+            _timer.Tick += (s, e) => UpdateData();
+            _timer.Start();
+        }
+
+        public void StopTimer()
+        {
+            _timer.Stop();
+        }
+
+        private void UpdateData()
+        {
+            var zones = _dataProvider.GetZonesSnapshot();
+
             var allProducts = zones.SelectMany(z => z.ShopsData)
                                    .SelectMany(s => s.MenuStats)
                                    .Where(p => p.SalesCount > 0)
@@ -30,7 +55,8 @@ namespace coursework.ViewModels
 
             decimal totalFestivalProfit = allProducts.Sum(p => p.TotalProfit);
             decimal cumulativeProfit = 0;
-            AbcItems = new List<AbcItem>();
+
+            AbcItems.Clear();
 
             foreach (var p in allProducts)
             {
@@ -47,7 +73,7 @@ namespace coursework.ViewModels
                     ShopName = p.ShopName,
                     ProductName = p.ProductName,
                     SalesCount = p.SalesCount,
-                    TotalRevenue = Math.Round(p.TotalProfit, 2), 
+                    TotalRevenue = Math.Round(p.TotalProfit, 2),
                     CumulativePercentage = Math.Round(cumulativePercent, 1),
                     Category = category,
                     CategoryColor = color

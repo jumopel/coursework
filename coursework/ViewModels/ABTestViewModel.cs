@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using LiveCharts;
@@ -75,6 +76,9 @@ namespace coursework.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 var stats = AnalyzePlan(dialog.FileName);
+
+                if (stats == null) return;
+
                 if (fileNumber == 1)
                 {
                     File1Name = Path.GetFileName(dialog.FileName);
@@ -91,7 +95,7 @@ namespace coursework.ViewModels
             }
         }
 
-        private double[] AnalyzePlan(string filePath)
+        private double[]? AnalyzePlan(string filePath)
         {
             try
             {
@@ -121,7 +125,15 @@ namespace coursework.ViewModels
                                     foreach (var item in menu.EnumerateArray())
                                     {
                                         double price = item.TryGetProperty("Price", out var p) ? p.GetDouble() : 0;
-                                        double time = item.TryGetProperty("PrepTime", out var t) ? t.GetDouble() : 5.0;
+
+                                        double time = 5.0;
+                                        if (item.TryGetProperty("PreparationTime", out var t) && t.ValueKind == JsonValueKind.String)
+                                        {
+                                            if (TimeSpan.TryParse(t.GetString(), out TimeSpan parsedTime))
+                                            {
+                                                time = parsedTime.TotalMinutes;
+                                            }
+                                        }
 
                                         totalShopPrice += price;
                                         totalShopTime += time;
@@ -146,11 +158,16 @@ namespace coursework.ViewModels
                     return new double[] { totalShops, avgTicket, hourlyRevenuePotential };
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return new double[] { 0, 0, 0 };
+                MessageBox.Show($"Не вдалося прочитати файл плану.\nПереконайтеся, що ви обрали правильний файл збереження GastroMetric.\n\nДеталі: {ex.Message}",
+                                "Помилка завантаження",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                return null;
             }
         }
+        
 
         private void UpdateCharts()
         {

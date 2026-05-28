@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows; 
 using System.Windows.Input;
 using coursework.Core;
 using coursework.Models;
@@ -30,6 +31,8 @@ namespace coursework.ViewModels
                 SetProperty(ref _newPrice, value);
                 if (!_costPriceEditedManually)
                     NewCostPrice = Math.Round(value * 0.4m, 2);
+                
+                (SubmitProductCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
         public decimal NewCostPrice
@@ -41,6 +44,8 @@ namespace coursework.ViewModels
                 SetProperty(ref _newCostPrice, value);
                 OnPropertyChanged(nameof(MarginPercent));
                 OnPropertyChanged(nameof(MarginHint));
+                
+                (SubmitProductCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
         public double NewPrepTime { get => _newPrepTime; set => SetProperty(ref _newPrepTime, value); }
@@ -79,7 +84,7 @@ namespace coursework.ViewModels
             _shop = shop;
 
             SubmitProductCommand = new RelayCommand(_ => SubmitProduct(), _ =>
-                !string.IsNullOrWhiteSpace(NewName) && NewPrice > 0 && NewPrepTime > 0 && NewCostPrice >= 0 && NewCostPrice < NewPrice);
+                !string.IsNullOrWhiteSpace(NewName) && NewPrice > 0 && NewPrepTime > 0 && NewCostPrice >= 0);
 
             RemoveProductCommand = new RelayCommand(param => RemoveProduct(param as Product));
             StartEditCommand = new RelayCommand(param => StartEdit(param as Product));
@@ -88,6 +93,20 @@ namespace coursework.ViewModels
 
         private void SubmitProduct()
         {
+            if (NewCostPrice >= NewPrice)
+            {
+                var result = MessageBox.Show(
+                    "Собівартість цієї страви більша або дорівнює ціні продажу.\nВи впевнені, що хочете продавати її у збиток (чи в нуль)?",
+                    "Попередження про маржинальність",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.No)
+                {
+                    return; 
+                }
+            }
+
             if (IsEditing && _editingProduct != null)
             {
                 _editingProduct.Name = NewName;
@@ -139,6 +158,8 @@ namespace coursework.ViewModels
             IsEditing = true;
             SubmitButtonText = "Зберегти";
             SubmitButtonColor = "#F39C12";
+            
+            (SubmitProductCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
 
         private void CancelEdit()
@@ -154,6 +175,8 @@ namespace coursework.ViewModels
             NewPrice = 100;
             NewCostPrice = 40;
             NewPrepTime = 3;
+            
+            (SubmitProductCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
 
         private void RemoveProduct(Product? p)
